@@ -7,7 +7,8 @@ init_display()
 from scripts.game import run_game
 from scripts.input_manager import refresh_input, set_key_pressed
 from scripts.particles import update_particles
-from scripts.coroutine_manager import update_coroutines
+from scripts.coroutine_manager import update_coroutines, create_coroutine
+from scripts.main_menu import intro_animation
 
 
 def pg_events() -> bool:
@@ -30,6 +31,8 @@ def pg_events() -> bool:
 def main():
     """ Main loop
     """
+
+    create_coroutine(intro_animation())
 
     while pg_events():
         delta_time: float = get_delta_time()

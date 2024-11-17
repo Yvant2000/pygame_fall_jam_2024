@@ -5,7 +5,6 @@ from pygame import Vector3
 
 from scripts import input_manager
 from scripts.display import get_delta_time
-from scripts import config
 
 grid_position: tuple[int, int] = 0, 0
 height: float = 1.3
@@ -16,6 +15,7 @@ fov: Final[float] = 90
 speed: Final[float] = 2
 jump_velocity: Final[float] = 3.5
 current_vertical_velocity: float = 0
+mouse_speed: Final[float] = 0.1
 
 
 def move():
@@ -23,8 +23,8 @@ def move():
 
     rel = input_manager.get_relative_mouse_movement()
 
-    angle_y -= rel[0] * config.mouse_speed
-    angle_x -= rel[1] * config.mouse_speed
+    angle_y -= rel[0] * mouse_speed
+    angle_x -= rel[1] * mouse_speed
 
     angle_x = max(min(angle_x, 90), -90)
 

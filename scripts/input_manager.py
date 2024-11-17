@@ -3,7 +3,7 @@ from pygame.key import ScancodeWrapper
 from pygame.constants import K_RETURN, K_SPACE, K_UP, K_DOWN, K_LEFT, K_RIGHT, K_w, K_s, K_a, K_d, K_z, K_q, K_LCTRL, \
     K_RCTRL, K_LSHIFT, K_RSHIFT
 
-from scripts.config import window_size
+from scripts import display
 
 keys_down: ScancodeWrapper  # keys that are currently down
 keys_pressed: set = set()  # keys that were pressed this frame
@@ -21,7 +21,7 @@ def refresh_input():
         pg_event.set_grab(True)  # Grab the mouse
         mouse_rel = mouse.get_rel()  # Get the mouse movement since the last frame
         if mouse_rel != (0, 0):
-            mouse.set_pos(window_size[0] // 2, window_size[1] // 2)
+            mouse.set_pos(display.window_size[0] // 2, display.window_size[1] // 2)
     else:
         # Give back the mouse control when the window is not active
         mouse.set_visible(True)

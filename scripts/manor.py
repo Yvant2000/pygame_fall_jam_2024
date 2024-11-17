@@ -1,7 +1,9 @@
+from typing import Final
+
 from scripts.room import Room
-from scripts.config import grid_size
 from scripts import player
 
+grid_size: Final[tuple[int, int]] = 8, 8
 rooms: list[list[Room | None]] = [[None for _ in range(grid_size[0])] for _ in range(grid_size[1])]
 
 

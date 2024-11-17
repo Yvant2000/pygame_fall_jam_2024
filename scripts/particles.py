@@ -3,7 +3,6 @@ from random import random
 from pygame import Vector2
 from pygame.draw import circle
 from scripts import display
-from scripts.config import window_size
 
 
 class Particle:
@@ -44,7 +43,7 @@ class Particle:
 
 
 amount: Final[int] = 50
-particles: Final[list[Particle]] = [Particle((window_size[0] // 2, window_size[1] // 2)) for _ in range(amount)]
+particles: Final[list[Particle]] = [Particle((display.window_size[0] // 2, display.window_size[1] // 2)) for _ in range(amount)]
 
 
 def update_particles(delta_time: float):
