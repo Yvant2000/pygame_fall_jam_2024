@@ -1,7 +1,7 @@
 from typing import Final
 
 from pygame import display, transform, Surface, Clock
-from pygame.constants import FULLSCREEN, SRCALPHA
+from pygame.constants import SRCALPHA, BLEND_RGB_SUB
 
 window_size: tuple[int, int]
 overlay_size: tuple[int, int]
@@ -18,6 +18,7 @@ display_ratio: float = 0.8  # how bug is the game screen compared to the window.
 display_flat: float = 0.0  # how much the game screen is flat. value between 0 and 1
 display_rotate: float = 0.0
 fps: Final[int] = 60
+fade_black: float = 0.0  # how much the screen is black. value between 0 and 1
 
 
 def init_display():
@@ -43,6 +44,8 @@ def update_display():
     resized_width: int = width * resized_height // height
     resized_height = round(resized_height * display_flat)
 
+    black_color = 255 * fade_black
+    game_screen.fill((black_color, black_color, black_color), special_flags=BLEND_RGB_SUB)
     resized_game_screen: Surface = transform.scale(game_screen, (resized_width, resized_height))
     rotated_game_screen: Surface = transform.rotate(resized_game_screen, display_rotate)
 

@@ -7,6 +7,7 @@ from pygame import Surface
 from scripts.input_manager import down_pressed, up_pressed, submit
 from scripts import display, textures, game
 from scripts.easing import ease_out_back, ease_out_bounce, ease_out_expo
+from scripts.coroutine_manager import create_coroutine
 
 
 class SubMenu(Enum):
@@ -14,7 +15,6 @@ class SubMenu(Enum):
     """
     NONE = 0
     SETTINGS = 1
-    CREDITS = 2
 
 
 class Options(Enum):
@@ -33,6 +33,9 @@ title_y: int = 0
 option_x: int = 0
 timer: float = 0
 
+credits_open: bool = False
+credit_y_pad: int = 1000
+
 
 def run_main_menu():
     """ Display the main menu and let the player choose an option.
@@ -43,14 +46,12 @@ def run_main_menu():
             run_main_menu_none()
         case SubMenu.SETTINGS:
             run_main_menu_settings()
-        case SubMenu.CREDITS:
-            run_main_menu_credits()
         case _:
             raise ValueError("Invalid submenu")
 
 
 def run_main_menu_none():
-    global selected_option, current_submenu, timer
+    global selected_option, current_submenu, timer, credits_open
 
     if down_pressed():
         selected_option = Options((selected_option.value + 1) % 4)
@@ -60,12 +61,11 @@ def run_main_menu_none():
     if submit():
         match selected_option:
             case Options.PLAY:
-                # todo: animation to enter the game
-                game.set_game_state(game.GameState.GAME)
+                create_coroutine(start_game_animation())
             case Options.SETTINGS:
                 current_submenu = SubMenu.SETTINGS
             case Options.CREDITS:
-                current_submenu = SubMenu.CREDITS
+                credits_open = not credits_open
             case Options.QUIT:
                 exit()
             case _:
@@ -83,6 +83,29 @@ def run_main_menu_none():
 
     display.display_rotate = sin(timer) * 1
     timer += display.delta_time * 2
+
+    display_credits()
+
+
+def display_credits():
+    global credit_y_pad
+
+    credit_image: Surface = textures.menu_credits
+    credits_height: int = credit_image.get_height()
+
+    if credits_open:
+        credit_y_pad -= 1000 * display.delta_time
+        if credit_y_pad < 0:
+            credit_y_pad = 0
+    else:
+        credit_y_pad += 1500 * display.delta_time
+        if credit_y_pad > credits_height:
+            credit_y_pad = credits_height
+
+    top_layer: Surface = display.window_top_layer
+    credit_x: int = top_layer.get_width() - credit_image.get_width()
+    credit_y: int = top_layer.get_height() - credits_height
+    display.window_top_layer.blit(textures.menu_credits, (credit_x, credit_y + credit_y_pad))
 
 
 def run_main_menu_settings():
@@ -106,7 +129,7 @@ def intro_animation() -> Generator:
     display.display_ratio = 0.0
     yield
 
-    progress = 0.0
+    progress: float = 0.0
 
     while progress < 1:
         delta_time = display.get_delta_time()
@@ -121,3 +144,33 @@ def intro_animation() -> Generator:
     display.display_ratio = 0.8
     title_y = 0
     option_x = 0
+
+
+def start_game_animation() -> Generator:
+    global title_y, option_x
+    progress: float = 0.0
+
+    yield
+
+    while progress < 1:
+        delta_time = display.get_delta_time()
+        display.fade_black = progress
+        display.display_ratio = 0.8 + 0.2 * ease_out_back(progress)
+        option_x = -750 * ease_out_expo(progress)
+        title_y = -300 * ease_out_bounce(progress)
+        yield
+        progress += delta_time / 2
+
+    display.fade_black = 1.0
+    display.display_rotate = 0.0
+    game.set_game_state(game.GameState.GAME)
+    progress = 1.0
+    yield
+
+    while progress > 0:
+        delta_time = display.get_delta_time()
+        display.fade_black = progress
+        yield
+        progress -= delta_time
+
+    display.fade_black = 0.0

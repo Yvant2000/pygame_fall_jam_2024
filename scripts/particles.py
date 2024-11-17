@@ -15,13 +15,13 @@ class Particle:
         self.size: float = 0
         self.remaining_lifetime: float = 0
         self.lifetime: float = 0
-
         self.init()
 
     def init(self):
+        rel_val = display.window_size[0]
         self.direction: Vector2 = Vector2(1, 0).rotate(random() * 360)
-        self.position: Vector2 = Vector2(self.start_position) + self.direction * 300
-        self.speed: float = random() * 250 + 50
+        self.position: Vector2 = Vector2(self.start_position) + self.direction * rel_val // 5
+        self.speed: float = random() * rel_val // 6 + rel_val // 10
         self.size: float = random() * 6 + 1
         self.lifetime: float = 3 * random() + 1
         self.remaining_lifetime: float = self.lifetime
@@ -43,7 +43,8 @@ class Particle:
 
 
 amount: Final[int] = 50
-particles: Final[list[Particle]] = [Particle((display.window_size[0] // 2, display.window_size[1] // 2)) for _ in range(amount)]
+particles: Final[list[Particle]] = [Particle((display.window_size[0] // 2, display.window_size[1] // 2)) for _ in
+                                    range(amount)]
 
 
 def update_particles(delta_time: float):
