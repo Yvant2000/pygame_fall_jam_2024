@@ -11,7 +11,7 @@ class GameState(Enum):
 game_state: GameState = GameState.MAIN_MENU
 
 
-def set_game_state(state: GameState):
+def set_game_state(state: GameState):  # Never ask what this function is for, I'm too ashamed
     global game_state
     game_state = state
 

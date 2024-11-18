@@ -35,6 +35,7 @@ timer: float = 0
 
 credits_open: bool = False
 credit_y_pad: int = 1000
+quit_menu: bool = False
 
 
 def run_main_menu():
@@ -51,7 +52,7 @@ def run_main_menu():
 
 
 def run_main_menu_none():
-    global selected_option, current_submenu, timer, credits_open
+    global selected_option, current_submenu, timer, credits_open, quit_menu
 
     if down_pressed():
         selected_option = Options((selected_option.value + 1) % 4)
@@ -61,6 +62,7 @@ def run_main_menu_none():
     if submit():
         match selected_option:
             case Options.PLAY:
+                quit_menu = True
                 create_coroutine(start_game_animation())
             case Options.SETTINGS:
                 current_submenu = SubMenu.SETTINGS
@@ -131,7 +133,7 @@ def intro_animation() -> Generator:
 
     progress: float = 0.0
 
-    while progress < 1:
+    while progress < 1 and not quit_menu:
         delta_time = display.get_delta_time()
         progress += delta_time / 3
         display.display_flat = ease_out_back(progress)

@@ -44,7 +44,7 @@ def update_display():
     resized_width: int = width * resized_height // height
     resized_height = round(resized_height * display_flat)
 
-    black_color = 255 * fade_black
+    black_color = max(0.0, min(255.0, 255 * fade_black))
     game_screen.fill((black_color, black_color, black_color), special_flags=BLEND_RGB_SUB)
     resized_game_screen: Surface = transform.scale(game_screen, (resized_width, resized_height))
     rotated_game_screen: Surface = transform.rotate(resized_game_screen, display_rotate)

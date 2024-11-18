@@ -93,4 +93,4 @@ textures: tuple[Surface, ...] = tuple(load_image("rooms", "textures", f"texture{
 
 # Props
 doors: tuple[Surface, ...] = tuple(load_image("props", "doors", f"door{i}") for i in range(4))
-lights: tuple[Surface, ...] = tuple(load_image("props", "lights", f"light{i}") for i in range(1))
+chandelier: Surface = load_image("props", "lights", f"chandelier")

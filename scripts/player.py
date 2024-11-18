@@ -2,6 +2,7 @@ from typing import Final
 from math import cos, sin, radians
 
 from pygame import Vector3
+from pysidocast import Scene
 
 from scripts import input_manager
 from scripts.display import get_delta_time
@@ -16,6 +17,7 @@ speed: Final[float] = 2
 jump_velocity: Final[float] = 3.5
 current_vertical_velocity: float = 0
 mouse_speed: Final[float] = 0.1
+reach = 2.5
 
 
 def move():
@@ -44,6 +46,9 @@ def move():
             if not input_manager.crouch():
                 position.y = height
                 current_vertical_velocity = 0
+            else:
+                position.y = 0.5
+                current_speed /= 2
         else:
             position.y += current_vertical_velocity * delta_time
             current_vertical_velocity -= 9.8 * delta_time
@@ -53,3 +58,12 @@ def move():
 
     position.x += vertical * cos(radians(angle_y)) + horizontal * cos(radians(angle_y + 90))
     position.z += vertical * sin(radians(angle_y)) + horizontal * sin(radians(angle_y + 90))
+
+
+def get_pointer(scene: Scene) -> tuple[float, float, float]:
+    distance = scene.single_cast(position, angle_x, angle_y, max_distance=reach)
+    return (
+        position.x + cos(radians(angle_y)) * distance * cos(radians(angle_x)),
+        position.y + sin(radians(angle_x)),
+        position.z + sin(radians(angle_y)) * distance * cos(radians(angle_x))
+    )
