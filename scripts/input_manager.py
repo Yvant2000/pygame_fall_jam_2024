@@ -113,4 +113,4 @@ def click() -> bool:
     """ Checks if the player clicked the mouse.
     :return: True if the mouse was clicked this frame.
     """
-    return not lock and mouse.get_pressed()[0] or mouse.get_pressed()[2]
+    return not lock and mouse.get_pressed()[0] or mouse.get_pressed()[2] or K_RETURN in keys_pressed

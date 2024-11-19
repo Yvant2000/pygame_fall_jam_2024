@@ -165,12 +165,12 @@ def start_game_animation() -> Generator:
 
     display.fade_black = 1.0
     display.display_rotate = 0.0
-    game.set_game_state(game.GameState.GAME)
+    game.start_game()
     progress = 1.0
     yield
 
     while progress > 0:
-        delta_time = display.get_delta_time()
+        delta_time = display.get_delta_time() / 2
         display.fade_black = progress
         yield
         progress -= delta_time

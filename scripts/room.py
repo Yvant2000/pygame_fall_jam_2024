@@ -1,6 +1,6 @@
 from random import choice as random_choice, randint
 
-from pygame import Surface
+from pygame import Surface, Rect
 from pysidocast import Scene
 from scripts import player, textures, display, input_manager
 
@@ -13,58 +13,78 @@ class Room:
         self.scene = Scene()
         self.size: tuple[int, int] = 8, 8
         self.height: float = 4
-        self.objects: list[GameObject] = [Chandelier(), Door((0, 0, 3.99), True, (pos[0], pos[1] + 1))]
+        self.objects: list[GameObject] = [Chandelier(), Door((0, 3.99), True, (pos[0], pos[1] + 1))]
         self.pos: tuple[int, int]
+        self._loaded: bool = False
+        self.collisions: list[Rect] = []
 
+        # keep this method as small as possible, all the heavy load must be in static_loads and dynamic_loads
+
+    def static_loads(self):
         wall_index: int = randint(0, textures.wall_count - 1)
         wall_sprite: Surface = textures.merge_wall(textures.walls_bot[wall_index], textures.walls_top[wall_index])
         wall_texture: Surface = random_choice(textures.textures)
 
-        self.wall_x: Surface = textures.repeat_layered(
+        wall_x: Surface = textures.repeat_layered(
             wall_sprite, self.size[0] // 2, 1, wall_texture, self.size[0] // 2 - 1, 3
         )
-        self.wall_z: Surface = textures.repeat_layered(
+        wall_z: Surface = textures.repeat_layered(
             wall_sprite, self.size[1] // 2, 1, wall_texture, self.size[1] // 2 - 1, 3
         )
 
-        floor_sprite: Surface = random_choice(textures.floors)
-        floor_texture = random_choice(textures.textures)
-        self.floor: Surface = textures.repeat_layered(
-            floor_sprite, self.size[0] // 2, self.size[1] // 2,
-            floor_texture, self.size[0] // 2 - 1, self.size[1] // 2 - 1
-        )
-
-        ceiling_sprite: Surface = random_choice(textures.ceilings)
-        ceiling_texture = random_choice(textures.textures)
-        self.ceiling: Surface = textures.repeat_layered(
-            ceiling_sprite, self.size[0] // 2, self.size[1] // 2,
-            ceiling_texture, self.size[0] // 2 - 1, self.size[1] // 2 - 1
-        )
-
-        for game_object in self.objects:
-            game_object.static_load(self)
-
-    def add_walls(self):
         x = self.size[0]
         y: float = self.height
         z = self.size[1]
         half_x: float = x / 2
         half_z: float = z / 2
 
-        self.scene.add_wall(self.wall_x, (-half_x, y, half_z), (half_x, 0, half_z))
-        self.scene.add_wall(self.wall_x, (half_x, y, -half_z), (-half_x, 0, -half_z))
-        self.scene.add_wall(self.wall_z, (-half_x, y, -half_z), (-half_x, 0, half_z))
-        self.scene.add_wall(self.wall_z, (half_x, y, half_z), (half_x, 0, -half_z))
+        self.scene.add_wall(wall_x, (-half_x, y, half_z), (half_x, 0, half_z))
+        self.scene.add_wall(wall_x, (half_x, y, -half_z), (-half_x, 0, -half_z))
+        self.scene.add_wall(wall_z, (-half_x, y, -half_z), (-half_x, 0, half_z))
+        self.scene.add_wall(wall_z, (half_x, y, half_z), (half_x, 0, -half_z))
 
-        self.scene.add_surface(self.floor, (-half_x, 0, -half_z), (half_x, 0, -half_z), (-half_x, 0, half_z))
-        self.scene.add_surface(self.ceiling, (-half_x, y, -half_z), (-half_x, y, half_z), (half_x, y, -half_z))
+        floor_sprite: Surface = random_choice(textures.floors)
+        floor_texture = random_choice(textures.textures)
+        floor: Surface = textures.repeat_layered(
+            floor_sprite, self.size[0] // 2, self.size[1] // 2,
+            floor_texture, self.size[0] // 2 - 1, self.size[1] // 2 - 1
+        )
 
-    def dynamic_walls(self):
+        self.scene.add_surface(floor, (-half_x, 0, -half_z), (half_x, 0, -half_z), (-half_x, 0, half_z))
+
+        ceiling_sprite: Surface = random_choice(textures.ceilings)
+        ceiling_texture = random_choice(textures.textures)
+        ceiling: Surface = textures.repeat_layered(
+            ceiling_sprite, self.size[0] // 2, self.size[1] // 2,
+            ceiling_texture, self.size[0] // 2 - 1, self.size[1] // 2 - 1
+        )
+
+        self.scene.add_surface(ceiling, (-half_x, y, -half_z), (-half_x, y, half_z), (half_x, y, -half_z))
+
+        self.collisions.append(Rect(-x, -half_z, half_x, z))
+        self.collisions.append(Rect(-half_x, -z, x, half_z))
+        self.collisions.append(Rect(half_x, -half_z, half_x, z))
+        self.collisions.append(Rect(-half_x, half_z, x, half_z))
+
+        for game_object in self.objects:
+            game_object.static_load(self)
+
+        self._loaded = True
+
+    def dynamic_loads(self):
         for game_object in self.objects:
             game_object.dynamic_load(self)
 
     def handle_interactions(self):
         player_pointer = player.get_pointer(self.scene)
+
+        # self.scene.add_wall(
+        #     textures.chandelier,
+        #     (player_pointer[0]-0.4, player_pointer[1]-0.4, player_pointer[2]-0.4),
+        #     (player_pointer[0]+0.4, player_pointer[1]+0.4, player_pointer[2]+0.4),
+        #     rm=True
+        # )  # test ot pointer position
+
         for game_object in self.objects:
             if game_object.can_interact(player_pointer):
                 if input_manager.click():
@@ -72,6 +92,8 @@ class Room:
                 break
 
     def display(self):
+        assert self._loaded, "should have called static_loads and dynamic_loads before calling display"
+
         self.scene.add_light(player.position, 2.5)  # player light
 
         render_distance: float = (self.size[0] ** 2 + self.size[1] ** 2) ** 0.5  # gives more depth to the scene
@@ -81,3 +103,6 @@ class Room:
             view_distance=render_distance
         )
         self.scene.clear_lights()
+
+    def get_collision(self):
+        return self.collisions

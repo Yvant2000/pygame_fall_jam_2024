@@ -72,6 +72,8 @@ def repeat_layered(image: Surface, x: int, y: int, layer: Surface, l_x: int, l_y
 main_menu: Surface = load_image("menu", "main")
 main_menu_title: Surface = load_image("menu", "title")
 menu_credits: Surface = load_image("menu", "credits")
+end_screen: Surface = load_image("menu", "end")
+end_message: Surface = load_image("menu", "end_message")
 
 mm_buttons: tuple[str, ...] = ("play", "settings", "credits", "quit")
 main_menu_buttons: tuple[Surface, ...] = tuple(load_image("menu", "buttons", button) for button in mm_buttons)
@@ -94,3 +96,4 @@ textures: tuple[Surface, ...] = tuple(load_image("rooms", "textures", f"texture{
 # Props
 doors: tuple[Surface, ...] = tuple(load_image("props", "doors", f"door{i}") for i in range(4))
 chandelier: Surface = load_image("props", "lights", f"chandelier")
+ending_door: Surface = load_image("props", "doors", "ending_door")

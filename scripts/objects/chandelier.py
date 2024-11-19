@@ -9,10 +9,11 @@ from scripts.textures import chandelier
 
 class Chandelier(GameObject):
     def __init__(self):
+        super().__init__()
         self.image = chandelier
 
         min_color = 0.7
-        max_color = 1.3
+        max_color = 1.1
         delta = max_color - min_color
         self.r = min_color + random() * delta
         self.g = min_color + random() * delta
@@ -34,4 +35,4 @@ class Chandelier(GameObject):
         )  # room light
         scene.add_light(
             (0, room.height - 0.8, 0), intensity=2 * self.intensity, red=self.r, green=self.g, blue=self.b
-            )  # ceiling light
+        )  # ceiling light

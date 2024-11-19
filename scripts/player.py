@@ -1,7 +1,7 @@
 from typing import Final
 from math import cos, sin, radians
 
-from pygame import Vector3
+from pygame import Vector3, Rect, FRect
 from pysidocast import Scene
 
 from scripts import input_manager
@@ -15,13 +15,13 @@ angle_y: float = 90
 fov: Final[float] = 90
 speed: Final[float] = 2
 jump_velocity: Final[float] = 3.5
-current_vertical_velocity: float = 0
 mouse_speed: Final[float] = 0.1
-reach = 2.5
+reach = 1.7
+movement_vector: Vector3 = Vector3()
 
 
-def move():
-    global position, angle_x, angle_y, current_vertical_velocity
+def move(collisions: list[Rect]):
+    global position, angle_x, angle_y, movement_vector
 
     rel = input_manager.get_relative_mouse_movement()
 
@@ -39,31 +39,52 @@ def move():
             position.y = 0.5
             current_speed /= 2
         elif input_manager.jump():
-            current_vertical_velocity = jump_velocity
-            position.y += current_vertical_velocity * delta_time
+            movement_vector.y = jump_velocity
+            position.y += movement_vector.y * delta_time
+            rect = FRect(position.x - 0.3, position.z - 0.3, 0.6, 0.6)
+            while rect.collidelist(collisions) != -1:
+                position.x -= movement_vector.x * delta_time
+                position.z -= movement_vector.z * delta_time
+                rect = FRect(position.x - 0.3, position.z - 0.3, 0.6, 0.6)
+
+            return
     else:
         if position.y < height:
             if not input_manager.crouch():
                 position.y = height
-                current_vertical_velocity = 0
             else:
                 position.y = 0.5
                 current_speed /= 2
         else:
-            position.y += current_vertical_velocity * delta_time
-            current_vertical_velocity -= 9.8 * delta_time
+            position += movement_vector * delta_time
+            movement_vector.y -= 9.8 * delta_time
+            return
 
-    horizontal = input_manager.horizontal_value() * delta_time * current_speed
-    vertical = input_manager.vertical_value() * delta_time * current_speed
+    horizontal = input_manager.horizontal_value()
+    horizontal_vector = Vector3(cos(radians(angle_y + 90)), 0, sin(radians(angle_y + 90))) * horizontal * current_speed
 
-    position.x += vertical * cos(radians(angle_y)) + horizontal * cos(radians(angle_y + 90))
-    position.z += vertical * sin(radians(angle_y)) + horizontal * sin(radians(angle_y + 90))
+    position += horizontal_vector * delta_time
+    rect = FRect(position.x - 0.3, position.z - 0.3, 0.6, 0.6)
+    while rect.collidelist(collisions) != -1:
+        position -= horizontal_vector * delta_time
+        rect = FRect(position.x - 0.3, position.z - 0.3, 0.6, 0.6)
+
+    vertical = input_manager.vertical_value()
+    vertical_vector = Vector3(cos(radians(angle_y)), 0, sin(radians(angle_y))) * vertical * current_speed
+
+    position += vertical_vector * delta_time
+    rect = FRect(position.x - 0.3, position.z - 0.3, 0.6, 0.6)
+    while rect.collidelist(collisions) != -1:
+        position -= vertical_vector * delta_time
+        rect = FRect(position.x - 0.3, position.z - 0.3, 0.6, 0.6)
+
+    movement_vector = horizontal_vector + vertical_vector
 
 
 def get_pointer(scene: Scene) -> tuple[float, float, float]:
     distance = scene.single_cast(position, angle_x, angle_y, max_distance=reach)
     return (
         position.x + cos(radians(angle_y)) * distance * cos(radians(angle_x)),
-        position.y + sin(radians(angle_x)),
+        position.y + sin(radians(angle_x)) * distance,
         position.z + sin(radians(angle_y)) * distance * cos(radians(angle_x))
     )

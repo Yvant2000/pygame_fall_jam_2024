@@ -56,6 +56,7 @@ def update_display():
 
     window.blit(rotated_game_screen, (pos_x, pos_y))
 
+    window_top_layer.fill((black_color, black_color, black_color), special_flags=BLEND_RGB_SUB)
     top_layer_scaled: Surface = transform.scale(window_top_layer, window_size)
     window.blit(top_layer_scaled, (0, 0))
 
