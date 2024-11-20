@@ -74,6 +74,7 @@ main_menu_title: Surface = load_image("menu", "title")
 menu_credits: Surface = load_image("menu", "credits")
 end_screen: Surface = load_image("menu", "end")
 end_message: Surface = load_image("menu", "end_message")
+loading: Surface = load_image("menu", "loading")
 
 mm_buttons: tuple[str, ...] = ("play", "settings", "credits", "quit")
 main_menu_buttons: tuple[Surface, ...] = tuple(load_image("menu", "buttons", button) for button in mm_buttons)

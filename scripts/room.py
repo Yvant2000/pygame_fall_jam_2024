@@ -1,4 +1,5 @@
 from random import choice as random_choice, randint
+from typing import Self
 
 from pygame import Surface, Rect
 from pysidocast import Scene
@@ -8,17 +9,40 @@ from scripts import player, textures, display, input_manager
 class Room:
     def __init__(self, pos: tuple[int, int]):
         from scripts.game_object import GameObject
-        from scripts.objects import Chandelier, Door
+        from scripts.objects import Chandelier
 
+        self.pos: tuple[int, int] = pos
         self.scene = Scene()
         self.size: tuple[int, int] = 8, 8
         self.height: float = 4
-        self.objects: list[GameObject] = [Chandelier(), Door((0, 3.99), True, (pos[0], pos[1] + 1))]
+        self.objects: list[GameObject] = [Chandelier()]  # Door((0, 3.99), True, (pos[0], pos[1] + 1))
         self.pos: tuple[int, int]
         self._loaded: bool = False
         self.collisions: list[Rect] = []
 
         # keep this method as small as possible, all the heavy load must be in static_loads and dynamic_loads
+
+    def connect_to(self, other: Self):
+        """Adds a door between two rooms"""
+        assert (self.pos[0] == other.pos[0] or self.pos[1] == other.pos[1]) and (
+                abs(self.pos[0] + self.pos[1] - other.pos[0] - other.pos[1]) == 1
+        ), "rooms must be adjacent"
+        from scripts.objects import Door
+
+        if self.pos[0] == other.pos[0]:
+            if self.pos[1] < other.pos[1]:
+                self.objects.append(Door((0, self.size[1] // 2 - 0.01), True, other.pos))
+                other.objects.append(Door((0, - other.size[1] // 2 + 0.01), True, self.pos))
+            else:
+                self.objects.append(Door((0, - self.size[1] // 2 + 0.01), True, other.pos))
+                other.objects.append(Door((0, other.size[1] // 2 - 0.01), True, self.pos))
+        else:
+            if self.pos[0] < other.pos[0]:
+                self.objects.append(Door((self.size[0] // 2 - 0.01, 0), False, other.pos))
+                other.objects.append(Door((- other.size[0] // 2 + 0.01, 0), False, self.pos))
+            else:
+                self.objects.append(Door((- self.size[0] // 2 + 0.01, 0), False, other.pos))
+                other.objects.append(Door((other.size[0] // 2 - 0.01, 0), False, self.pos))
 
     def static_loads(self):
         wall_index: int = randint(0, textures.wall_count - 1)

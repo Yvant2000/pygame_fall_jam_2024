@@ -9,15 +9,15 @@ from scripts.display import get_delta_time
 
 grid_position: tuple[int, int] = 0, 0
 height: float = 1.3
-position: Vector3 = Vector3()
+position: Vector3 = Vector3((-2, 1.3, -2))
+movement_vector: Vector3 = Vector3()
 angle_x: float = 0
-angle_y: float = 90
+angle_y: float = 45
 fov: Final[float] = 90
 speed: Final[float] = 2
 jump_velocity: Final[float] = 3.5
 mouse_speed: Final[float] = 0.1
-reach = 1.7
-movement_vector: Vector3 = Vector3()
+reach: Final[float] = 1.7
 
 
 def move(collisions: list[Rect]):
@@ -34,49 +34,44 @@ def move(collisions: list[Rect]):
 
     current_speed = speed
 
-    if position.y == height:
-        if input_manager.crouch():
-            position.y = 0.5
-            current_speed /= 2
-        elif input_manager.jump():
-            movement_vector.y = jump_velocity
-            position.y += movement_vector.y * delta_time
-            rect = FRect(position.x - 0.3, position.z - 0.3, 0.6, 0.6)
-            while rect.collidelist(collisions) != -1:
-                position.x -= movement_vector.x * delta_time
-                position.z -= movement_vector.z * delta_time
-                rect = FRect(position.x - 0.3, position.z - 0.3, 0.6, 0.6)
+    if position.y < height:
+        position.y = height
 
-            return
-    else:
-        if position.y < height:
-            if not input_manager.crouch():
-                position.y = height
-            else:
-                position.y = 0.5
-                current_speed /= 2
-        else:
-            position += movement_vector * delta_time
-            movement_vector.y -= 9.8 * delta_time
-            return
+    if position.y > height:
+        position += movement_vector * delta_time
+        movement_vector.y -= 9.8 * delta_time
+        rect = FRect(position.x - 0.3, position.z - 0.3, 0.6, 0.6)
+        if rect.collidelist(collisions) != -1:
+            position.x -= movement_vector.x * delta_time
+            position.z -= movement_vector.z * delta_time
+            movement_vector.x = movement_vector.z = 0
+        return
+
+    if input_manager.jump():
+        movement_vector *= 1.2
+        movement_vector.y = jump_velocity
+        position += movement_vector * delta_time
+        return
+
+    if input_manager.crouch():
+        position.y = 0.5
+        current_speed /= 2
 
     horizontal = input_manager.horizontal_value()
     horizontal_vector = Vector3(cos(radians(angle_y + 90)), 0, sin(radians(angle_y + 90))) * horizontal * current_speed
 
     position += horizontal_vector * delta_time
     rect = FRect(position.x - 0.3, position.z - 0.3, 0.6, 0.6)
-    while rect.collidelist(collisions) != -1:
+    if rect.collidelist(collisions) != -1:
         position -= horizontal_vector * delta_time
-        rect = FRect(position.x - 0.3, position.z - 0.3, 0.6, 0.6)
 
     vertical = input_manager.vertical_value()
     vertical_vector = Vector3(cos(radians(angle_y)), 0, sin(radians(angle_y))) * vertical * current_speed
 
     position += vertical_vector * delta_time
     rect = FRect(position.x - 0.3, position.z - 0.3, 0.6, 0.6)
-    while rect.collidelist(collisions) != -1:
+    if rect.collidelist(collisions) != -1:
         position -= vertical_vector * delta_time
-        rect = FRect(position.x - 0.3, position.z - 0.3, 0.6, 0.6)
 
     movement_vector = horizontal_vector + vertical_vector
 

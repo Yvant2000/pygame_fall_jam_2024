@@ -1,14 +1,15 @@
 from random import choice as random_choice
 from typing import Generator
 
-from pygame import Vector3, Surface
+from pygame import Surface
+from pygame.draw import line as draw_line
 from pysidocast import Scene
 
 from scripts.coroutine_manager import create_coroutine
 from scripts.display import get_delta_time
 from scripts.game_object import GameObject
 from scripts.textures import doors
-from scripts import input_manager, display, player
+from scripts import input_manager, display, player, manor
 
 
 class Door(GameObject):
@@ -53,8 +54,18 @@ class Door(GameObject):
             display.fade_black = progress
             yield
 
+        draw_line(
+            manor.manor_map, (100, 100, 100),
+            (player.grid_position[1] * 4 + 1, player.grid_position[0] * 4 + 1),
+            (self.destination[1] * 4 + 1, self.destination[0] * 4 + 1),
+        )
+
         player.grid_position = self.destination
-        player.position = Vector3()  # todo
+        if self.axis_x:
+            player.position.z *= -1
+        else:
+            player.position.x *= -1
+
         input_manager.lock = False
 
         progress = 0

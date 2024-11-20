@@ -163,11 +163,22 @@ def start_game_animation() -> Generator:
         yield
         progress += delta_time / 2
 
-    display.fade_black = 1.0
+    display.fade_black = 0.0
+    display.display_ratio = 0.0
+    # loading = textures.loading
+    # display.window_top_layer.blit(
+    #     loading,
+    #     (display.window_top_layer.get_width() // 2 - loading.get_width() // 2,
+    #      display.window_top_layer.get_height() // 2 - loading.get_height() // 2)
+    # )
+    # TODO: if games takes too long to load, display a loading screen
+    yield
+
+    display.display_ratio = 1.0
     display.display_rotate = 0.0
+    display.fade_black = 1.0
     game.start_game()
     progress = 1.0
-    yield
 
     while progress > 0:
         delta_time = display.get_delta_time() / 2
