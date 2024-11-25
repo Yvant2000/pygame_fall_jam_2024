@@ -1,7 +1,8 @@
 from typing import Final
+from os import environ as env
 
 from pygame import display, transform, Surface, Clock
-from pygame.constants import SRCALPHA, BLEND_RGB_SUB
+from pygame.constants import SRCALPHA, BLEND_RGB_SUB, SCALED
 
 window_size: tuple[int, int]
 overlay_size: tuple[int, int]
@@ -20,13 +21,20 @@ display_rotate: float = 0.0
 fps: Final[int] = 60
 fade_black: float = 0.0  # how much the screen is black. value between 0 and 1
 
+env['SDL_VIDEO_CENTERED'] = '1'
 
-def init_display():
+
+def init_display(fullscreen: bool = True):
     """Initialize the display for the game. \n
     This function should be called before any other display functions.
     """
     global window, game_screen, window_top_layer, window_size, overlay_size
-    window = display.set_mode(vsync=True)
+
+    if fullscreen:
+        window = display.set_mode(vsync=True)
+    else:
+        window = display.set_mode((1080, 1080), vsync=True, flags=SCALED)
+
     window_size = window.get_size()
     overlay_size = window_size[0] * 1080 // window_size[1], 1080
     window_top_layer = Surface(overlay_size, SRCALPHA).convert_alpha()

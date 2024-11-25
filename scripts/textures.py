@@ -2,7 +2,7 @@ from typing import Final
 from os.path import join as join_path
 
 from pygame import Surface, image as pg_image
-from pygame.transform import scale
+from pygame.transform import scale, flip
 from pygame.constants import BLEND_RGB_MULT
 
 images_folder: str = join_path("assets", "images")
@@ -27,6 +27,24 @@ def merge_wall(bottom_image: Surface, top_image: Surface) -> Surface:
     merged_image: Surface = Surface((width, height)).convert_alpha()
     merged_image.blit(top_image, (0, 0))
     merged_image.blit(bottom_image, (0, top_image.get_height()))
+
+    return merged_image
+
+
+def merge_carpet(carpet_image: Surface) -> Surface:
+    """ Merge a carpet image with itself to create a bigger carpet.
+    A carpet image is just a corner of the full carpet.
+    :param carpet_image:
+    :return:
+    """
+
+    width, height = carpet_image.get_size()
+    merged_image: Surface = Surface((width * 2, height * 2)).convert_alpha()
+
+    merged_image.blit(carpet_image, (0, 0))
+    merged_image.blit(flip(carpet_image, True, False), (width, 0))
+    merged_image.blit(flip(carpet_image, False, True), (0, height))
+    merged_image.blit(flip(carpet_image, True, True), (width, height))
 
     return merged_image
 
@@ -83,6 +101,13 @@ main_menu_buttons_selected: tuple[Surface, ...] = tuple(
 )
 del mm_buttons
 
+opt_buttons: tuple[str, ...] = ("fullscreen", "display_map_on", "display_map_off", "back")
+options_buttons: tuple[Surface, ...] = tuple(load_image("menu", "buttons", button) for button in opt_buttons)
+options_buttons_selected: tuple[Surface, ...] = tuple(
+    load_image("menu", "buttons", f"{button}_selected") for button in opt_buttons
+)
+del opt_buttons
+
 # Rooms
 walls_bot: tuple[Surface, ...] = tuple(load_image("rooms", "walls", f"wall{i}_bot") for i in range(2))
 walls_top: tuple[Surface, ...] = tuple(load_image("rooms", "walls", f"wall{i}_top") for i in range(2))
@@ -94,7 +119,12 @@ floors: tuple[Surface, ...] = tuple(load_image("rooms", "floors", f"floor{i}") f
 
 textures: tuple[Surface, ...] = tuple(load_image("rooms", "textures", f"texture{i}") for i in range(4))
 
+carpets: tuple[Surface, ...] = tuple(load_image("rooms", "carpets", f"carpet{i}") for i in range(4))
+
 # Props
 doors: tuple[Surface, ...] = tuple(load_image("props", "doors", f"door{i}") for i in range(4))
 chandelier: Surface = load_image("props", "lights", f"chandelier")
 ending_door: Surface = load_image("props", "doors", "ending_door")
+table_tops: tuple[Surface, ...] = tuple(load_image("props", "tables", f"top{i}") for i in range(4))
+table_side: Surface = load_image("props", "tables", "side")
+table_lamp: Surface = load_image("props", "lights", "table_lamp")

@@ -5,16 +5,9 @@ from typing import Generator
 from pygame import Surface
 
 from scripts.input_manager import down_pressed, up_pressed, submit
-from scripts import display, textures, game
+from scripts import display, textures, game, manor
 from scripts.easing import ease_out_back, ease_out_bounce, ease_out_expo
 from scripts.coroutine_manager import create_coroutine
-
-
-class SubMenu(Enum):
-    """ Enum class for the main menu submenus.
-    """
-    NONE = 0
-    SETTINGS = 1
 
 
 class Options(Enum):
@@ -26,59 +19,68 @@ class Options(Enum):
     QUIT = 3
 
 
-current_submenu: SubMenu = SubMenu.NONE
 selected_option: Options = Options.PLAY
 
 title_y: int = 0
 option_x: int = 0
 timer: float = 0
 
+settings_open: bool = False
+settings_x_pad: int = 1000
+settings_selected: int = 2
 credits_open: bool = False
 credit_y_pad: int = 1000
 quit_menu: bool = False
+fullscreen: bool = True
 
 
 def run_main_menu():
     """ Display the main menu and let the player choose an option.
     """
 
-    match current_submenu:
-        case SubMenu.NONE:
-            run_main_menu_none()
-        case SubMenu.SETTINGS:
-            run_main_menu_settings()
-        case _:
-            raise ValueError("Invalid submenu")
+    global selected_option, timer, credits_open, quit_menu, settings_open, settings_selected, fullscreen
 
+    if settings_open:
+        credits_open = False
+        if down_pressed():
+            settings_selected = (settings_selected + 1) % 3
+        elif up_pressed():
+            settings_selected = (settings_selected - 1) % 3
+        elif submit():
+            match settings_selected:
+                case 0:
+                    fullscreen = not fullscreen
+                    display.init_display(fullscreen)
+                case 1:
+                    manor.map_displayed = not manor.map_displayed
+                case 2:
+                    settings_open = False
 
-def run_main_menu_none():
-    global selected_option, current_submenu, timer, credits_open, quit_menu
-
-    if down_pressed():
-        selected_option = Options((selected_option.value + 1) % 4)
-    elif up_pressed():
-        selected_option = Options((selected_option.value - 1) % 4)
-
-    if submit():
-        match selected_option:
-            case Options.PLAY:
-                quit_menu = True
-                create_coroutine(start_game_animation())
-            case Options.SETTINGS:
-                current_submenu = SubMenu.SETTINGS
-            case Options.CREDITS:
-                credits_open = not credits_open
-            case Options.QUIT:
-                exit()
-            case _:
-                raise ValueError("Invalid option")
+    else:
+        if down_pressed():
+            selected_option = Options((selected_option.value + 1) % 4)
+        elif up_pressed():
+            selected_option = Options((selected_option.value - 1) % 4)
+        elif submit():
+            match selected_option:
+                case Options.PLAY:
+                    quit_menu = True
+                    create_coroutine(start_game_animation())
+                case Options.SETTINGS:
+                    settings_open = True
+                case Options.CREDITS:
+                    credits_open = not credits_open
+                case Options.QUIT:
+                    exit()
+                case _:
+                    raise ValueError("Invalid option")
 
     display.game_screen.blit(textures.main_menu, (0, 0))
 
     display.window_top_layer.blit(textures.main_menu_title, (0, title_y))
 
     for i in range(4):
-        y = 300 + i * 100
+        y = 250 + i * 100
         button: Surface
         button = textures.main_menu_buttons_selected[i] if i == selected_option.value else textures.main_menu_buttons[i]
         display.window_top_layer.blit(button, (option_x, y))
@@ -87,6 +89,7 @@ def run_main_menu_none():
     timer += display.delta_time * 2
 
     display_credits()
+    display_settings()
 
 
 def display_credits():
@@ -110,16 +113,46 @@ def display_credits():
     display.window_top_layer.blit(textures.menu_credits, (credit_x, credit_y + credit_y_pad))
 
 
-def run_main_menu_settings():
-    global current_submenu
-    print("TODO")
-    current_submenu = SubMenu.NONE
+def display_settings():
+    global settings_x_pad
 
+    if settings_open:
+        settings_x_pad -= 1500 * display.delta_time
+        if settings_x_pad < 0:
+            settings_x_pad = 0
+    else:
+        settings_x_pad += 2000 * display.delta_time
+        if settings_x_pad > 1000:
+            settings_x_pad = 1000
 
-def run_main_menu_credits():
-    global current_submenu
-    print("TODO")
-    current_submenu = SubMenu.NONE
+    pos_x = display.window_top_layer.get_width() - textures.options_buttons[1].get_width() + settings_x_pad + 50
+    pos_y = 650
+    height = textures.options_buttons[0].get_height()
+
+    if settings_selected == 0:
+        display.window_top_layer.blit(textures.options_buttons_selected[0], (pos_x, pos_y))
+    else:
+        display.window_top_layer.blit(textures.options_buttons[0], (pos_x, pos_y))
+
+    pos_y += height
+
+    if settings_selected == 1:
+        if manor.map_displayed:
+            display.window_top_layer.blit(textures.options_buttons_selected[1], (pos_x, pos_y))
+        else:
+            display.window_top_layer.blit(textures.options_buttons_selected[2], (pos_x, pos_y))
+    else:
+        if manor.map_displayed:
+            display.window_top_layer.blit(textures.options_buttons[1], (pos_x, pos_y))
+        else:
+            display.window_top_layer.blit(textures.options_buttons[2], (pos_x, pos_y))
+
+    pos_y += height
+
+    if settings_selected == 2:
+        display.window_top_layer.blit(textures.options_buttons_selected[3], (pos_x, pos_y))
+    else:
+        display.window_top_layer.blit(textures.options_buttons[3], (pos_x, pos_y))
 
 
 def intro_animation() -> Generator:

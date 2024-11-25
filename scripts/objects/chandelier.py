@@ -32,7 +32,7 @@ class Chandelier(GameObject):
         scene.add_light(
             (0, room.height, 0), intensity=4 * self.intensity, direction=(0, 0, 0),
             red=self.r, green=self.g, blue=self.b
-        )  # room light
+        )
         scene.add_light(
             (0, room.height - 0.8, 0), intensity=2 * self.intensity, red=self.r, green=self.g, blue=self.b
-        )  # ceiling light
+        )

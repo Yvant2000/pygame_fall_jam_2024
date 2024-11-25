@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
 from pygame import Surface
-from pygame.locals import Rect
+from pygame.rect import FRect
 from pygame.constants import BLEND_RGB_ADD, BLEND_RGB_SUB
 
 from scripts.room import Room
@@ -20,7 +20,7 @@ class GameObject(ABC):
         ...
 
     @property
-    def colliders(self) -> list[Rect]:
+    def colliders(self) -> list[FRect]:
         """Returns all colliders in the object"""
         return []
 

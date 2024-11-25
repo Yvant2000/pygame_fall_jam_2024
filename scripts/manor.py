@@ -10,19 +10,23 @@ from scripts.room import Room
 from scripts import player, display
 
 grid_size: Final[int] = 8
-rooms: list[list[Room]] = [[Room((j, i)) for i in range(grid_size)] for j in range(grid_size)]
+rooms: list[list[Room]]
 seed: int = randrange(999999999)
 manor_map: Surface = Surface((grid_size * 4, grid_size * 4), flags=SRCALPHA)
 discovered: list[list[bool]] = [[False for _ in range(grid_size)] for _ in range(grid_size)]
+map_displayed: bool = True
 
 
 def init_manor():
+    global rooms
     from scripts.rooms import GoalRoom
 
     manor_map.fill((0, 0, 0, 0))
 
     global seed
     set_random_seed(seed)
+
+    rooms = [[Room((j, i)) for i in range(grid_size)] for j in range(grid_size)]
 
     # 0 0 is the starting
     # 7 7 is the goal
@@ -122,5 +126,8 @@ def draw_map():
     height: int = display.window.get_height()
     map_height: int = height // 5
     rescaled_map: Surface = scale(manor_map, (map_height, map_height))
+
+    if not map_displayed:
+        return
 
     display.window.blit(rescaled_map, (display.window.get_width() - rescaled_map.get_width(), 0))

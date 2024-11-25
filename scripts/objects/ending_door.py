@@ -6,6 +6,7 @@ from scripts import input_manager, display, game
 from scripts.coroutine_manager import create_coroutine
 from scripts.display import get_delta_time
 from scripts.objects.door import Door
+from scripts.room import Room
 from scripts.textures import ending_door
 
 
@@ -17,6 +18,9 @@ class EndingDoor(Door):
 
     def interact(self):
         create_coroutine(end_game())
+
+    def dynamic_load(self, room: Room):
+        room.scene.add_light((3.99, 1.0, 0.0), intensity=2.0, red=1, green=1, blue=1)
 
 
 def end_game() -> Generator:

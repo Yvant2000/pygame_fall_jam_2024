@@ -1,7 +1,8 @@
 from random import choice as random_choice, randint
 from typing import Self
 
-from pygame import Surface, Rect
+from pygame import Surface
+from pygame import FRect
 from pysidocast import Scene
 from scripts import player, textures, display, input_manager
 
@@ -9,16 +10,30 @@ from scripts import player, textures, display, input_manager
 class Room:
     def __init__(self, pos: tuple[int, int]):
         from scripts.game_object import GameObject
-        from scripts.objects import Chandelier
+        from scripts.objects import Chandelier, Table, TableLamp
 
         self.pos: tuple[int, int] = pos
         self.scene = Scene()
         self.size: tuple[int, int] = 8, 8
         self.height: float = 4
-        self.objects: list[GameObject] = [Chandelier()]  # Door((0, 3.99), True, (pos[0], pos[1] + 1))
+        self.objects: list[GameObject] = []
         self.pos: tuple[int, int]
         self._loaded: bool = False
-        self.collisions: list[Rect] = []
+        self.collisions: list[FRect] = []
+
+        self.table: Table | None = None
+
+        light: bool = False
+
+        if randint(0, 2) == 0:
+            self.objects.append(Table())
+
+            if randint(0, 1) == 0:
+                light = True
+                self.objects.append(TableLamp())
+
+        if not light:
+            self.objects.append(Chandelier())
 
         # keep this method as small as possible, all the heavy load must be in static_loads and dynamic_loads
 
@@ -74,6 +89,11 @@ class Room:
             floor_texture, self.size[0] // 2 - 1, self.size[1] // 2 - 1
         )
 
+        if randint(0, 3) > 0:
+            carpet_sprite: Surface = random_choice(textures.carpets)
+            carpet = textures.merge_carpet(carpet_sprite)
+            floor.blit(carpet, (randint(22, floor.get_width() - 150), randint(22, floor.get_height() - 150)))
+
         self.scene.add_surface(floor, (-half_x, 0, -half_z), (half_x, 0, -half_z), (-half_x, 0, half_z))
 
         ceiling_sprite: Surface = random_choice(textures.ceilings)
@@ -85,10 +105,10 @@ class Room:
 
         self.scene.add_surface(ceiling, (-half_x, y, -half_z), (-half_x, y, half_z), (half_x, y, -half_z))
 
-        self.collisions.append(Rect(-x, -half_z, half_x, z))
-        self.collisions.append(Rect(-half_x, -z, x, half_z))
-        self.collisions.append(Rect(half_x, -half_z, half_x, z))
-        self.collisions.append(Rect(-half_x, half_z, x, half_z))
+        self.collisions.append(FRect(-x, -half_z, half_x, z))
+        self.collisions.append(FRect(-half_x, -z, x, half_z))
+        self.collisions.append(FRect(half_x, -half_z, half_x, z))
+        self.collisions.append(FRect(-half_x, half_z, x, half_z))
 
         for game_object in self.objects:
             game_object.static_load(self)
@@ -128,5 +148,11 @@ class Room:
         )
         self.scene.clear_lights()
 
-    def get_collision(self):
-        return self.collisions
+    def get_collision(self) -> list[FRect]:
+
+        collisions: list[FRect] = self.collisions.copy()
+
+        for game_object in self.objects:
+            collisions.extend(game_object.colliders)
+
+        return collisions

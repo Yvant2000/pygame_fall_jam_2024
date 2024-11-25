@@ -1,7 +1,7 @@
 from pygame import mouse, key, event as pg_event
 from pygame.key import ScancodeWrapper
 from pygame.constants import K_RETURN, K_SPACE, K_UP, K_DOWN, K_LEFT, K_RIGHT, K_w, K_s, K_a, K_d, K_z, K_q, K_LCTRL, \
-    K_RCTRL, K_LSHIFT, K_RSHIFT
+    K_RCTRL, K_LSHIFT, K_RSHIFT, K_TAB
 
 from scripts import display
 
@@ -114,3 +114,10 @@ def click() -> bool:
     :return: True if the mouse was clicked this frame.
     """
     return not lock and mouse.get_pressed()[0] or mouse.get_pressed()[2] or K_RETURN in keys_pressed
+
+
+def toggle_map() -> bool:
+    """ Checks if the player pressed the map key.
+    :return: True if the map key was pressed this frame.
+    """
+    return K_TAB in keys_pressed
