@@ -72,6 +72,8 @@ class Room:
             else:
                 self.down_door = Door((- self.size[0] // 2 + 0.01, 0), False, False, other.pos)
                 other.up_door = Door((other.size[0] // 2 - 0.01, 0), False, True, self.pos)
+                self.objects.append(self.down_door)
+                other.objects.append(other.up_door)
 
     def lock_door_to(self, pos: tuple[int, int]):
         if self.up_door is not None and self.up_door.destination == pos:
@@ -105,6 +107,13 @@ class Room:
             self.objects.append(Key((cos(random_angle) * 1.0, 0.9, sin(random_angle) * 1.0)))
 
     def static_loads(self):
+
+        from scripts.objects import Door, Key
+        door_count = len([o for o in self.objects if isinstance(o, Door)])
+        key_count = len([o for o in self.objects if isinstance(o, Key)])
+        if door_count == 1 and key_count == 0:
+            print(f"Room {self.pos} has a door but no key")
+
         wall_index: int = randint(0, textures.wall_count - 1)
         wall_sprite: Surface = textures.merge_wall(textures.walls_bot[wall_index], textures.walls_top[wall_index])
         wall_texture: Surface = random_choice(textures.textures)

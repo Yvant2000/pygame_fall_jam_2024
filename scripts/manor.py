@@ -94,24 +94,45 @@ def init_manor():
     marked_rooms = [[False for _ in range(grid_size)] for _ in range(grid_size)]
     available_rooms = [(0, 0)]
     available_keys: int = 0
-    while len(available_rooms) > 0:
+    next_group: list[tuple[int, int]] = []
+    current_group: list[tuple[int, int]] = []
+
+    while len(available_rooms) > 0 or len(next_group) > 0:
+
+        if len(available_rooms) == 0:
+
+            # link all rooms in curent group
+            for room_a in current_group:
+                for room_b in current_group:
+                    if ((room_a[0] == room_b[0] or room_a[1] == room_b[1])
+                            and (abs(room_a[0] + room_a[1] - room_b[0] - room_b[1]) == 1)):
+                        rooms[room_a[0]][room_a[1]].connect_to(rooms[room_b[0]][room_b[1]])
+
+            available_rooms = next_group
+            next_group = []
+            current_group = []
+
         room = random_choice(available_rooms)
-        print(room)
         available_rooms.remove(room)
         marked_rooms[room[0]][room[1]] = True
+        current_group.append(room)
+
+        # print(f"Handling {room}; {[r for r in graph[room[0]][room[1]] if not marked_rooms[r[0]][r[1]]]}")
 
         # todo groups
         if room != end_pos:
             neighbors = [r for r in graph[room[0]][room[1]] if not marked_rooms[r[0]][r[1]]]
             if len(neighbors) == 0:
                 rooms[room[0]][room[1]].add_key()
-                print(f"Key dropped at {room}")
                 available_keys += 1
+                # print(f"Drop Key in {room}")
             else:
                 if available_keys > 0:
                     available_keys -= 1
                     neighbor_to_lock = random_choice(neighbors)
                     rooms[room[0]][room[1]].lock_door_to(neighbor_to_lock)
+                    next_group.append(neighbor_to_lock)
+                    neighbors.remove(neighbor_to_lock)
 
                 for neighbor in neighbors:
                     available_rooms.append(neighbor)

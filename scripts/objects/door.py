@@ -8,7 +8,7 @@ from pysidocast import Scene
 from scripts.coroutine_manager import create_coroutine
 from scripts.display import get_delta_time
 from scripts.game_object import GameObject
-from scripts.textures import doors
+from scripts.textures import doors, lock
 from scripts import input_manager, display, player, manor
 from scripts.room import Room
 
@@ -42,6 +42,35 @@ class Door(GameObject):
                 self.buffer,
                 (self.position[0], self.position[1] + half_height, self.position[2] - rayon),
                 (self.position[0], self.position[1] - half_height, self.position[2] + rayon)
+            )
+
+    def dynamic_load(self, room: Room):
+        if not self.locked:
+            return
+
+        rayon = 0.3
+        height = 0.7
+        half_height = height / 2
+
+        distance_to_player = (player.position[0] - self.position[0]) ** 2 + (player.position[2] - self.position[2]) ** 2
+        alpha = max(0.0, min(1.0, 1.0 - distance_to_player / 8.0 + 0.2))
+
+        scene: Scene = room.scene
+        if self.axis_x:
+            scene.add_wall(
+                lock,
+                (self.position[0] * 0.98 - rayon, self.position[1] + half_height, self.position[2] * 0.98),
+                (self.position[0] * 0.98 + rayon, self.position[1] - half_height, self.position[2] * 0.98),
+                rm=True,
+                alpha=alpha
+            )
+        else:
+            scene.add_wall(
+                lock,
+                (self.position[0] * 0.98, self.position[1] + half_height, self.position[2] * 0.98 - rayon),
+                (self.position[0] * 0.98, self.position[1] - half_height, self.position[2] * 0.98 + rayon),
+                rm=True,
+                alpha=alpha
             )
 
     def interact(self):
