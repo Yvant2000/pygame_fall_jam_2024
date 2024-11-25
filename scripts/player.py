@@ -19,6 +19,7 @@ speed: Final[float] = 2
 jump_velocity: Final[float] = 3.5
 mouse_speed: Final[float] = 0.1
 reach: Final[float] = 1.7
+key_count: int = 0
 
 
 def move(collisions: list[FRect]):

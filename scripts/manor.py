@@ -90,6 +90,32 @@ def init_manor():
         graph[room[0]][room[1]].append(neighbor)
         graph[neighbor[0]][neighbor[1]].append(room)
 
+    # we visit all rooms and drop keys at dead ends
+    marked_rooms = [[False for _ in range(grid_size)] for _ in range(grid_size)]
+    available_rooms = [(0, 0)]
+    available_keys: int = 0
+    while len(available_rooms) > 0:
+        room = random_choice(available_rooms)
+        print(room)
+        available_rooms.remove(room)
+        marked_rooms[room[0]][room[1]] = True
+
+        # todo groups
+        if room != end_pos:
+            neighbors = [r for r in graph[room[0]][room[1]] if not marked_rooms[r[0]][r[1]]]
+            if len(neighbors) == 0:
+                rooms[room[0]][room[1]].add_key()
+                print(f"Key dropped at {room}")
+                available_keys += 1
+            else:
+                if available_keys > 0:
+                    available_keys -= 1
+                    neighbor_to_lock = random_choice(neighbors)
+                    rooms[room[0]][room[1]].lock_door_to(neighbor_to_lock)
+
+                for neighbor in neighbors:
+                    available_rooms.append(neighbor)
+
     for list_rooms in rooms:  # type: list[Room]
         for room in list_rooms:  # type: Room
             room.static_loads()
@@ -113,21 +139,20 @@ def run_manor():
 def draw_map():
     discovered[player.grid_position[0]][player.grid_position[1]] = True
 
-    not_discovered = (0, 0, 0)
-
     for i in range(grid_size):
         for j in range(grid_size):
-            draw_rect(manor_map, ((150, 150, 150) if discovered[i][j] else not_discovered), (j * 4, i * 4, 3, 3))
+            if discovered[i][j]:
+                draw_rect(manor_map, (150, 150, 150), (j * 4, i * 4, 3, 3))
 
     draw_rect(manor_map, (50, 50, 225), (player.grid_position[1] * 4, player.grid_position[0] * 4, 3, 3))
     if discovered[grid_size - 1][grid_size - 1]:
         draw_rect(manor_map, (50, 225, 50), ((grid_size - 1) * 4, (grid_size - 1) * 4, 3, 3))
 
-    height: int = display.window.get_height()
+    height: int = display.window_top_layer.get_height()
     map_height: int = height // 5
     rescaled_map: Surface = scale(manor_map, (map_height, map_height))
 
     if not map_displayed:
         return
 
-    display.window.blit(rescaled_map, (display.window.get_width() - rescaled_map.get_width(), 0))
+    display.window_top_layer.blit(rescaled_map, (display.window_top_layer.get_width() - rescaled_map.get_width(), 0))

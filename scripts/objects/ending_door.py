@@ -12,7 +12,7 @@ from scripts.textures import ending_door
 
 class EndingDoor(Door):
     def __init__(self):
-        super().__init__((3.99, 0), False, (0, 0))
+        super().__init__((3.99, 0), False, True, (0, 0))
         self.image: Surface = ending_door
         self.buffer: Surface = self.image.copy()
 

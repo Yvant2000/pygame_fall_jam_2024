@@ -16,7 +16,7 @@ def load_image(path: str, *var_path: str) -> Surface:
 
 def merge_wall(bottom_image: Surface, top_image: Surface) -> Surface:
     """ Merge two images into one, placing the first image bellow the second image.
-    :param bottom_image: The image that will be placed bellow.
+    :param bottom_image: The image that will be placed bellows.
     :param top_image: The image that will be placed on top.
     :return: The merged image.
     """
@@ -128,3 +128,6 @@ ending_door: Surface = load_image("props", "doors", "ending_door")
 table_tops: tuple[Surface, ...] = tuple(load_image("props", "tables", f"top{i}") for i in range(4))
 table_side: Surface = load_image("props", "tables", "side")
 table_lamp: Surface = load_image("props", "lights", "table_lamp")
+key: Surface = load_image("props", "key")
+small_table_front: Surface = load_image("props", "tables", "small_front")
+small_table_side: Surface = load_image("props", "tables", "small_side")

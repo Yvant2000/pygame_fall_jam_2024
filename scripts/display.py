@@ -18,7 +18,6 @@ delta_time: float = 0  # seconds
 display_ratio: float = 0.8  # how bug is the game screen compared to the window. value between 0 and 1
 display_flat: float = 0.0  # how much the game screen is flat. value between 0 and 1
 display_rotate: float = 0.0
-fps: Final[int] = 60
 fade_black: float = 0.0  # how much the screen is black. value between 0 and 1
 
 env['SDL_VIDEO_CENTERED'] = '1'
@@ -80,7 +79,8 @@ def clear_game_screen():
     window.fill((0, 0, 0))
     window_top_layer.fill((0, 0, 0, 0))
 
-    delta_time = clock.tick(fps) / 1000
+    delta_time = clock.tick() / 1000
+    # print(f"fps: {clock.get_fps()}")
 
 
 def get_delta_time() -> float:

@@ -1,4 +1,5 @@
-from random import choice as random_choice, randint
+from random import choice as random_choice, randint, random
+from math import pi, cos, sin
 from typing import Self
 
 from pygame import Surface
@@ -10,7 +11,7 @@ from scripts import player, textures, display, input_manager
 class Room:
     def __init__(self, pos: tuple[int, int]):
         from scripts.game_object import GameObject
-        from scripts.objects import Chandelier, Table, TableLamp
+        from scripts.objects import Chandelier, Table, TableLamp, Door
 
         self.pos: tuple[int, int] = pos
         self.scene = Scene()
@@ -25,8 +26,14 @@ class Room:
 
         light: bool = False
 
+        self.up_door: Door | None = None
+        self.down_door: Door | None = None
+        self.right_door: Door | None = None
+        self.left_door: Door | None = None
+
         if randint(0, 2) == 0:
-            self.objects.append(Table())
+            self.table = Table()
+            self.objects.append(self.table)
 
             if randint(0, 1) == 0:
                 light = True
@@ -44,20 +51,58 @@ class Room:
         ), "rooms must be adjacent"
         from scripts.objects import Door
 
+        # worse fucking code ever wrote in my life
         if self.pos[0] == other.pos[0]:
             if self.pos[1] < other.pos[1]:
-                self.objects.append(Door((0, self.size[1] // 2 - 0.01), True, other.pos))
-                other.objects.append(Door((0, - other.size[1] // 2 + 0.01), True, self.pos))
+                self.right_door = Door((0, self.size[1] // 2 - 0.01), True, True, other.pos)
+                other.left_door = Door((0, - other.size[1] // 2 + 0.01), True, False, self.pos)
+                self.objects.append(self.right_door)
+                other.objects.append(other.left_door)
             else:
-                self.objects.append(Door((0, - self.size[1] // 2 + 0.01), True, other.pos))
-                other.objects.append(Door((0, other.size[1] // 2 - 0.01), True, self.pos))
+                self.left_door = Door((0, - self.size[1] // 2 + 0.01), True, False, other.pos)
+                other.right_door = Door((0, other.size[1] // 2 - 0.01), True, True, self.pos)
+                self.objects.append(self.left_door)
+                other.objects.append(other.right_door)
         else:
             if self.pos[0] < other.pos[0]:
-                self.objects.append(Door((self.size[0] // 2 - 0.01, 0), False, other.pos))
-                other.objects.append(Door((- other.size[0] // 2 + 0.01, 0), False, self.pos))
+                self.up_door = Door((self.size[0] // 2 - 0.01, 0), False, True, other.pos)
+                other.down_door = Door((- other.size[0] // 2 + 0.01, 0), False, False, self.pos)
+                self.objects.append(self.up_door)
+                other.objects.append(other.down_door)
             else:
-                self.objects.append(Door((- self.size[0] // 2 + 0.01, 0), False, other.pos))
-                other.objects.append(Door((other.size[0] // 2 - 0.01, 0), False, self.pos))
+                self.down_door = Door((- self.size[0] // 2 + 0.01, 0), False, False, other.pos)
+                other.up_door = Door((other.size[0] // 2 - 0.01, 0), False, True, self.pos)
+
+    def lock_door_to(self, pos: tuple[int, int]):
+        if self.up_door is not None and self.up_door.destination == pos:
+            self.up_door.locked = True
+        elif self.down_door is not None and self.down_door.destination == pos:
+            self.down_door.locked = True
+        elif self.right_door is not None and self.right_door.destination == pos:
+            self.right_door.locked = True
+        elif self.left_door is not None and self.left_door.destination == pos:
+            self.left_door.locked = True
+        else:
+            raise ValueError(
+                f"The door to lock does not exist: {pos}\nAvailables: {(
+                    None if self.up_door is None else self.up_door.destination,
+                    None if self.down_door is None else self.down_door.destination,
+                    None if self.right_door is None else self.right_door.destination,
+                    None if self.left_door is None else self.left_door.destination
+                )}"
+            )
+
+    def add_key(self):
+        from scripts.objects import Key, SmallTable
+
+        random_angle = random() * 2 * pi
+
+        if self.table is None:
+            distance = 2.5 * random()
+            self.objects.append(SmallTable((cos(random_angle) * distance, sin(random_angle) * distance)))
+            self.objects.append(Key((cos(random_angle) * distance, 0.8, sin(random_angle) * distance)))
+        else:
+            self.objects.append(Key((cos(random_angle) * 1.0, 0.9, sin(random_angle) * 1.0)))
 
     def static_loads(self):
         wall_index: int = randint(0, textures.wall_count - 1)
