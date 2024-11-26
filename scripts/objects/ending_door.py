@@ -1,4 +1,5 @@
 from typing import Generator
+from os.path import join as join_path
 
 from pygame import Surface
 from pygame.mixer import music
@@ -45,3 +46,5 @@ def end_game() -> Generator:
         yield
 
     display.fade_black = 0
+    music.load(join_path("assets", "sounds", "end.mp3"))
+    music.play(-1, fade_ms=3000)

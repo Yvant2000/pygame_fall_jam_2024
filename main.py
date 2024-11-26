@@ -25,7 +25,7 @@ def pg_events() -> bool:
             case pygame.KEYDOWN:
                 set_key_pressed(event.key)
             case pygame.MOUSEBUTTONDOWN:
-                if event.button == 1:
+                if event.button == 1 or event.button == 3:
                     set_left_click_pressed()
 
     return True

@@ -86,6 +86,8 @@ def repeat_layered(image: Surface, x: int, y: int, layer: Surface, l_x: int, l_y
     return repeated_image
 
 
+icon: Surface = load_image("icon")
+
 # Menus
 main_menu: Surface = load_image("menu", "main")
 main_menu_title: Surface = load_image("menu", "title")
@@ -128,7 +130,10 @@ ending_door: Surface = load_image("props", "doors", "ending_door")
 table_tops: tuple[Surface, ...] = tuple(load_image("props", "tables", f"top{i}") for i in range(4))
 table_side: Surface = load_image("props", "tables", "side")
 table_lamp: Surface = load_image("props", "lights", "table_lamp")
+paper: Surface = load_image("props", "tables", "paper")
 key: Surface = load_image("props", "key")
 small_table_front: Surface = load_image("props", "tables", "small_front")
 small_table_side: Surface = load_image("props", "tables", "small_side")
 lock: Surface = load_image("props", "lock")
+leather_chair: tuple[Surface, ...] = tuple(load_image("props", "leather_chair", f"leather{i}") for i in range(8))
+busts: tuple[Surface, ...] = tuple(load_image("props", "busts", f"bust{i}") for i in range(3))

@@ -5,3 +5,5 @@ from scripts.objects.table import Table
 from scripts.objects.table_lamp import TableLamp
 from scripts.objects.key import Key
 from scripts.objects.small_table import SmallTable
+from scripts.objects.leather_chair import LeatherChair
+from scripts.objects.bust import Bust

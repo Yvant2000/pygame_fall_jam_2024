@@ -11,7 +11,7 @@ from scripts import player, textures, display, input_manager
 class Room:
     def __init__(self, pos: tuple[int, int]):
         from scripts.game_object import GameObject
-        from scripts.objects import Chandelier, Table, TableLamp, Door
+        from scripts.objects import Chandelier, Table, TableLamp, Door, Bust
 
         self.pos: tuple[int, int] = pos
         self.scene = Scene()
@@ -22,9 +22,8 @@ class Room:
         self._loaded: bool = False
         self.collisions: list[FRect] = []
 
-        self.table: Table | None = None
-
-        light: bool = False
+        self.table: GameObject | None = None
+        self.light: GameObject | None = None
 
         self.up_door: Door | None = None
         self.down_door: Door | None = None
@@ -36,19 +35,21 @@ class Room:
             self.objects.append(self.table)
 
             if randint(0, 1) == 0:
-                light = True
-                self.objects.append(TableLamp())
+                self.light = TableLamp()
+                self.objects.append(self.light)
+            elif randint(0, 1) == 0:
+                self.objects.append(Bust((0, 0.85, 0)))
 
-        if not light:
-            self.objects.append(Chandelier())
+        if self.light is None:
+            self.light = Chandelier()
+            self.objects.append(self.light)
 
         # keep this method as small as possible, all the heavy load must be in static_loads and dynamic_loads
 
     def connect_to(self, other: Self):
         """Adds a door between two rooms"""
         assert (self.pos[0] == other.pos[0] or self.pos[1] == other.pos[1]) and (
-                abs(self.pos[0] + self.pos[1] - other.pos[0] - other.pos[1]) == 1
-        ), "rooms must be adjacent"
+                abs(self.pos[0] + self.pos[1] - other.pos[0] - other.pos[1]) == 1), "rooms must be adjacent"
         from scripts.objects import Door
 
         # worse fucking code ever wrote in my life
@@ -95,14 +96,16 @@ class Room:
             )
 
     def add_key(self):
-        from scripts.objects import Key, SmallTable
+        from scripts.objects import Key, SmallTable, LeatherChair
 
         random_angle = random() * 2 * pi
 
         if self.table is None:
             distance = 2.5 * random()
-            self.objects.append(SmallTable((cos(random_angle) * distance, sin(random_angle) * distance)))
+            self.table = SmallTable((cos(random_angle) * distance, sin(random_angle) * distance))
+            self.objects.append(self.table)
             self.objects.append(Key((cos(random_angle) * distance, 0.8, sin(random_angle) * distance)))
+            self.objects.append(LeatherChair((cos(random_angle + pi), sin(random_angle + pi))))
         else:
             self.objects.append(Key((cos(random_angle) * 1.0, 0.9, sin(random_angle) * 1.0)))
 

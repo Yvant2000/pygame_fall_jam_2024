@@ -39,6 +39,10 @@ def init_display(fullscreen: bool = True):
     window_top_layer = Surface(overlay_size, SRCALPHA).convert_alpha()
     game_screen = Surface(game_screen_size)
 
+    from scripts import textures
+    display.set_icon(textures.icon)
+    display.set_caption("64 Rooms")
+
 
 def update_display():
     """Update the display with the game screen."""

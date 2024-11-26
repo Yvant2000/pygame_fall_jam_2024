@@ -5,9 +5,9 @@ from typing import Generator
 from pygame import Surface
 
 from scripts.input_manager import down_pressed, up_pressed, submit
-from scripts import display, textures, game, manor
 from scripts.easing import ease_out_back, ease_out_bounce, ease_out_expo
 from scripts.coroutine_manager import create_coroutine
+from scripts import display, textures, game, manor, sounds
 
 
 class Options(Enum):
@@ -44,9 +44,12 @@ def run_main_menu():
         credits_open = False
         if down_pressed():
             settings_selected = (settings_selected + 1) % 3
+            sounds.menu_down.play()
         elif up_pressed():
             settings_selected = (settings_selected - 1) % 3
+            sounds.menu_up.play()
         elif submit():
+            sounds.menu_select.play()
             match settings_selected:
                 case 0:
                     fullscreen = not fullscreen
@@ -55,20 +58,24 @@ def run_main_menu():
                     manor.map_displayed = not manor.map_displayed
                 case 2:
                     settings_open = False
-
     else:
         if down_pressed():
             selected_option = Options((selected_option.value + 1) % 4)
+            sounds.menu_down.play()
         elif up_pressed():
             selected_option = Options((selected_option.value - 1) % 4)
+            sounds.menu_up.play()
         elif submit():
             match selected_option:
                 case Options.PLAY:
+                    sounds.menu_start.play()
                     quit_menu = True
                     create_coroutine(start_game_animation())
                 case Options.SETTINGS:
+                    sounds.menu_select.play()
                     settings_open = True
                 case Options.CREDITS:
+                    sounds.menu_select.play()
                     credits_open = not credits_open
                 case Options.QUIT:
                     exit()

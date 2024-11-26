@@ -18,3 +18,8 @@ key_pickup: tuple[Sound, ...] = tuple(load_sound("key_pickup", f"key{i}") for i 
 door_closed: tuple[Sound, ...] = tuple(load_sound("door_closed", f"door{i}") for i in range(4))
 door_unlocked: tuple[Sound, ...] = tuple(load_sound("door_unlocked", f"door{i}") for i in range(4))
 door_opened: tuple[Sound, ...] = tuple(load_sound("door_opened", f"door{i}") for i in range(5))
+
+menu_up: Sound = load_sound("menu", "up")
+menu_down: Sound = load_sound("menu", "down")
+menu_select: Sound = load_sound("menu", "select")
+menu_start: Sound = load_sound("menu", "start")

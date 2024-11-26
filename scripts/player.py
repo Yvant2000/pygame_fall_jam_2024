@@ -61,7 +61,12 @@ def move(collisions: list[FRect]):
         sound.set_volume(0.25)
         sound.play()
 
-    if input_manager.jump():
+    crouch: bool = input_manager.crouch()
+
+    if crouch:
+        position.y = 0.5
+        current_speed /= 2
+    elif input_manager.jump():
         movement_vector *= 1.2
         movement_vector.y = jump_velocity
         position += movement_vector * delta_time
@@ -72,11 +77,7 @@ def move(collisions: list[FRect]):
             movement_vector.x = movement_vector.z = 0
         return
 
-    crouch: bool = input_manager.crouch()
 
-    if crouch:
-        position.y = 0.5
-        current_speed /= 2
 
     horizontal = input_manager.horizontal_value()
     horizontal_vector = Vector3(cos(radians(angle_y + 90)), 0, sin(radians(angle_y + 90))) * horizontal * current_speed
