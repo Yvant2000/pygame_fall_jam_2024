@@ -1,9 +1,10 @@
 from typing import Generator
 from math import cos, sin
+from random import choice as random_choice
 
 from scripts.coroutine_manager import create_coroutine
 from scripts.game_object import GameObject
-from scripts import textures, player, display
+from scripts import textures, player, display, sounds
 from scripts.room import Room
 
 
@@ -44,7 +45,7 @@ class Key(GameObject):
         player.key_count += 1
         self.is_interactable = False
         create_coroutine(self.pickup())
-        # todo sound
+        random_choice(sounds.key_pickup).play()
 
     def pickup(self) -> Generator:
         up_velocity = 2.0

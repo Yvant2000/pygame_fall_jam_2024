@@ -1,7 +1,7 @@
 from random import choice as random_choice
 from typing import Generator
 
-from pygame import Surface
+from pygame import Surface, Sound
 from pygame.draw import line as draw_line
 from pysidocast import Scene
 
@@ -9,8 +9,8 @@ from scripts.coroutine_manager import create_coroutine
 from scripts.display import get_delta_time
 from scripts.game_object import GameObject
 from scripts.textures import doors, lock
-from scripts import input_manager, display, player, manor
 from scripts.room import Room
+from scripts import input_manager, display, player, manor, sounds
 
 
 class Door(GameObject):
@@ -24,6 +24,7 @@ class Door(GameObject):
         self.destination: tuple[int, int] = destination
         self.is_interactable = True
         self.locked = False
+        self.current_sound: Sound = sounds.door_closed[0]
 
     def static_load(self, room):
         rayon = 1.0
@@ -53,7 +54,7 @@ class Door(GameObject):
         half_height = height / 2
 
         distance_to_player = (player.position[0] - self.position[0]) ** 2 + (player.position[2] - self.position[2]) ** 2
-        alpha = max(0.0, min(1.0, 1.0 - distance_to_player / 8.0 + 0.2))
+        alpha = max(0.0, min(1.0, 1.0 - distance_to_player / 7.0 + 0.2))
 
         scene: Scene = room.scene
         if self.axis_x:
@@ -78,9 +79,11 @@ class Door(GameObject):
             if player.key_count > 0:
                 player.key_count -= 1
                 self.locked = False
-                # todo sound
+                random_choice(sounds.door_unlocked).play()
             else:
-                # todo sound
+                if self.current_sound.get_num_channels() == 0:
+                    self.current_sound = random_choice(sounds.door_closed)
+                    self.current_sound.play()
                 draw_line(
                     manor.manor_map, (150, 50, 50),
                     (player.grid_position[1] * 4 + 1, player.grid_position[0] * 4 + 1),
@@ -88,6 +91,7 @@ class Door(GameObject):
                 )
                 return
 
+        random_choice(sounds.door_opened).play()
         create_coroutine(self.move_to_next_room())
 
     def move_to_next_room(self) -> Generator:
@@ -96,7 +100,7 @@ class Door(GameObject):
 
         progress = 0
         while progress < 1:
-            progress += get_delta_time()
+            progress += get_delta_time() * 1.5
             display.fade_black = progress
             yield
 

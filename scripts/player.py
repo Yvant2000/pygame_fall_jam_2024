@@ -1,11 +1,12 @@
 from typing import Final
 from math import cos, sin, radians
+from random import choice as random_choice
 
 from pygame import Vector3
 from pygame.rect import FRect
 from pysidocast import Scene
 
-from scripts import input_manager, manor
+from scripts import input_manager, manor, sounds
 from scripts.display import get_delta_time
 
 grid_position: tuple[int, int] = 0, 0
@@ -20,10 +21,11 @@ jump_velocity: Final[float] = 3.5
 mouse_speed: Final[float] = 0.1
 reach: Final[float] = 1.7
 key_count: int = 0
+sound_timer: float = 0
 
 
 def move(collisions: list[FRect]):
-    global position, angle_x, angle_y, movement_vector
+    global position, angle_x, angle_y, movement_vector, sound_timer
 
     if input_manager.toggle_map():
         manor.map_displayed = not manor.map_displayed
@@ -43,6 +45,7 @@ def move(collisions: list[FRect]):
         position.y = height
 
     if position.y > height:
+        sound_timer = 0
         position += movement_vector * delta_time
         movement_vector.y -= 9.8 * delta_time
         rect = FRect(position.x - 0.3, position.z - 0.3, 0.6, 0.6)
@@ -51,6 +54,12 @@ def move(collisions: list[FRect]):
             position.z -= movement_vector.z * delta_time
             movement_vector.x = movement_vector.z = 0
         return
+
+    if sound_timer < 0:
+        sound_timer = 0.75
+        sound = random_choice(sounds.steps)
+        sound.set_volume(0.25)
+        sound.play()
 
     if input_manager.jump():
         movement_vector *= 1.2
@@ -63,7 +72,9 @@ def move(collisions: list[FRect]):
             movement_vector.x = movement_vector.z = 0
         return
 
-    if input_manager.crouch():
+    crouch: bool = input_manager.crouch()
+
+    if crouch:
         position.y = 0.5
         current_speed /= 2
 
@@ -84,6 +95,11 @@ def move(collisions: list[FRect]):
         position -= vertical_vector * delta_time
 
     movement_vector = horizontal_vector + vertical_vector
+
+    if movement_vector.length_squared() > 0:
+        sound_timer -= delta_time / 2 if crouch else delta_time
+    else:
+        sound_timer = 0.2
 
 
 def get_pointer(scene: Scene) -> tuple[float, float, float]:

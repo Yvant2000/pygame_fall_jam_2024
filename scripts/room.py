@@ -87,10 +87,10 @@ class Room:
         else:
             raise ValueError(
                 f"The door to lock does not exist: {pos}\nAvailables: {(
-                    None if self.up_door is None else self.up_door.destination,
-                    None if self.down_door is None else self.down_door.destination,
-                    None if self.right_door is None else self.right_door.destination,
-                    None if self.left_door is None else self.left_door.destination
+                    self.up_door.destination if self.up_door is not None else None,
+                    self.down_door.destination if self.down_door is not None else None,
+                    self.right_door.destination if self.right_door is not None else None,
+                    self.left_door.destination if self.left_door is not None else None
                 )}"
             )
 
@@ -107,13 +107,6 @@ class Room:
             self.objects.append(Key((cos(random_angle) * 1.0, 0.9, sin(random_angle) * 1.0)))
 
     def static_loads(self):
-
-        from scripts.objects import Door, Key
-        door_count = len([o for o in self.objects if isinstance(o, Door)])
-        key_count = len([o for o in self.objects if isinstance(o, Key)])
-        if door_count == 1 and key_count == 0:
-            print(f"Room {self.pos} has a door but no key")
-
         wall_index: int = randint(0, textures.wall_count - 1)
         wall_sprite: Surface = textures.merge_wall(textures.walls_bot[wall_index], textures.walls_top[wall_index])
         wall_texture: Surface = random_choice(textures.textures)

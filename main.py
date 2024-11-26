@@ -5,7 +5,7 @@ pygame.init()
 init_display()
 
 from scripts.game import run_game
-from scripts.input_manager import refresh_input, set_key_pressed
+from scripts.input_manager import refresh_input, set_key_pressed, set_left_click_pressed
 from scripts.particles import update_particles
 from scripts.coroutine_manager import update_coroutines, create_coroutine
 from scripts.main_menu import intro_animation
@@ -24,6 +24,9 @@ def pg_events() -> bool:
                 return False
             case pygame.KEYDOWN:
                 set_key_pressed(event.key)
+            case pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    set_left_click_pressed()
 
     return True
 

@@ -109,8 +109,8 @@ options_buttons_selected: tuple[Surface, ...] = tuple(
 del opt_buttons
 
 # Rooms
-walls_bot: tuple[Surface, ...] = tuple(load_image("rooms", "walls", f"wall{i}_bot") for i in range(2))
-walls_top: tuple[Surface, ...] = tuple(load_image("rooms", "walls", f"wall{i}_top") for i in range(2))
+walls_bot: tuple[Surface, ...] = tuple(load_image("rooms", "walls", f"wall{i}_bot") for i in range(4))
+walls_top: tuple[Surface, ...] = tuple(load_image("rooms", "walls", f"wall{i}_top") for i in range(4))
 wall_count: Final[int] = len(walls_bot)
 assert wall_count == len(walls_top)
 

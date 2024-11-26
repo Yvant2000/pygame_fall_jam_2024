@@ -1,6 +1,7 @@
 from typing import Generator
 
 from pygame import Surface
+from pygame.mixer import music
 
 from scripts import input_manager, display, game
 from scripts.coroutine_manager import create_coroutine
@@ -25,6 +26,7 @@ class EndingDoor(Door):
 
 def end_game() -> Generator:
     input_manager.lock = True
+    music.fadeout(3000)
     yield
 
     progress = 0

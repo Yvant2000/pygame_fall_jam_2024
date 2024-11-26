@@ -1,10 +1,12 @@
 from typing import Final
-from random import randrange, seed as set_random_seed, choice as random_choice
+from random import randrange, seed as set_random_seed, choice as random_choice, randint
+from os.path import join as join_path
 
 from pygame import Surface
 from pygame.constants import SRCALPHA
 from pygame.draw import rect as draw_rect
 from pygame.transform import scale
+from pygame.mixer import music
 
 from scripts.room import Room
 from scripts import player, display
@@ -123,9 +125,10 @@ def init_manor():
         if room != end_pos:
             neighbors = [r for r in graph[room[0]][room[1]] if not marked_rooms[r[0]][r[1]]]
             if len(neighbors) == 0:
-                rooms[room[0]][room[1]].add_key()
-                available_keys += 1
-                # print(f"Drop Key in {room}")
+                if randint(0, 2) == 0:
+                    rooms[room[0]][room[1]].add_key()
+                    available_keys += 1
+                    # print(f"Drop Key in {room}")
             else:
                 if available_keys > 0:
                     available_keys -= 1
@@ -140,6 +143,10 @@ def init_manor():
     for list_rooms in rooms:  # type: list[Room]
         for room in list_rooms:  # type: Room
             room.static_loads()
+
+    music.load(join_path("assets", "sounds", "an_empty_manor.mp3"))
+    music.set_volume(0.5)
+    music.play(-1)
 
 
 def run_manor():

@@ -11,12 +11,14 @@ keys_pressed: set = set()  # keys that were pressed this frame
 mouse_rel: tuple[int, int] = 0, 0
 
 lock: bool = False
+left_click_pressed: bool = False
 
 
 def refresh_input():
-    global keys_down, mouse_rel
+    global keys_down, mouse_rel, left_click_pressed
     keys_down = key.get_pressed()
     keys_pressed.clear()
+    left_click_pressed = False
 
     if key.get_focused():  # Place the mouse in the center of the screen when the window is active
         mouse.set_visible(False)  # Hide the mouse
@@ -33,6 +35,11 @@ def refresh_input():
 
 def set_key_pressed(key_code: int):
     keys_pressed.add(key_code)
+
+
+def set_left_click_pressed():
+    global left_click_pressed
+    left_click_pressed = True
 
 
 def submit() -> bool:
@@ -113,7 +120,7 @@ def click() -> bool:
     """ Checks if the player clicked the mouse.
     :return: True if the mouse was clicked this frame.
     """
-    return not lock and mouse.get_pressed()[0] or mouse.get_pressed()[2] or K_RETURN in keys_pressed
+    return not lock and left_click_pressed or K_RETURN in keys_pressed
 
 
 def toggle_map() -> bool:
