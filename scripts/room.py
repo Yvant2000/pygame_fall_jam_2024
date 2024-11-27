@@ -84,12 +84,8 @@ class Room:
             self.left_door.locked = True
         else:
             raise ValueError(
-                f"The door to lock does not exist: {pos}\nAvailables: {(
-                    self.up_door.destination if self.up_door is not None else None,
-                    self.down_door.destination if self.down_door is not None else None,
-                    self.right_door.destination if self.right_door is not None else None,
-                    self.left_door.destination if self.left_door is not None else None
-                )}"
+                f"The door to lock does not exist: {pos}\nAvailables: "
+                f"{(self.up_door.destination if self.up_door is not None else None, self.down_door.destination if self.down_door is not None else None, self.right_door.destination if self.right_door is not None else None, self.left_door.destination if self.left_door is not None else None)}"
             )
 
     def add_key(self):
