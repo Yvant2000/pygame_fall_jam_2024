@@ -1,2 +1,6 @@
 .idea/
 __pycache__/
+main.build/
+main.dist/
+main.onefile-build/
+pygame_dlls/

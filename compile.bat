@@ -1,0 +1,1 @@
+python -m nuitka --standalone --onefile --python-flag=-O --main=main.py --prefer-source-code --include-data-dir=assets=assets --include-data-files=pygame_dlls/*.dll=./

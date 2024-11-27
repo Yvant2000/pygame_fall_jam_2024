@@ -48,8 +48,9 @@ class Key(GameObject):
         random_choice(sounds.key_pickup).play()
 
     def pickup(self) -> Generator:
+        yield
         up_velocity = 2.0
-        while self.position[1] > 0.0:
+        while self.position[1] > -1.0:
             self.position = (
                 self.position[0],
                 self.position[1] + up_velocity * display.delta_time,

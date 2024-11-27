@@ -17,10 +17,10 @@ def rsin(angle: float) -> float:
 
 
 class LeatherChair(GameObject):
-    def __init__(self, position: tuple[float, float]):
+    def __init__(self, position: tuple[float, float], angle: float | None = None):
         super().__init__()
         self.position = position[0], 0.0, position[1]
-        self.angle = random() * 360
+        self.angle: float = angle if angle is not None else random() * 360
 
     @property
     def colliders(self):
@@ -38,7 +38,7 @@ class LeatherChair(GameObject):
         player_pos = player.position
         dx = self.position[0] - player_pos[0]
         dz = self.position[2] - player_pos[2]
-        angle = (180 + 180 / pi * -atan2(dz, dx))
+        angle = (self.angle + 180 / pi * -atan2(dz, dx)) % 360
 
         pa = player.angle_y + 90
 

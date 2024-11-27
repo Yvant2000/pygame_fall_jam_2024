@@ -9,3 +9,9 @@ from scripts.objects.leather_chair import LeatherChair
 from scripts.objects.table_ornement import TableOrnement
 from scripts.objects.pillar import Pillar
 from scripts.objects.plant import Plant
+from scripts.objects.room_center import RoomCenter
+from scripts.objects.wooden_chair import WoodenChair
+from scripts.objects.bookshelf import Bookshelf
+from scripts.objects.george import George
+from scripts.objects.closet import Closet
+from scripts.objects.clock import Clock

@@ -126,7 +126,7 @@ def init_manor():
         if room != end_pos:
             neighbors = [r for r in graph[room[0]][room[1]] if not marked_rooms[r[0]][r[1]]]
             if len(neighbors) == 0:
-                if randint(0, 2) == 0:
+                if randint(0, 4) <= 1:
                     rooms[room[0]][room[1]].add_key()
                     available_keys += 1
                     # print(f"Drop Key in {room}")

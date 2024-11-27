@@ -9,9 +9,10 @@ from scripts import textures
 
 
 class SmallTable(GameObject):
-    def __init__(self, position: tuple[float, float]):
+    def __init__(self, position: tuple[float, float], angle: float | None = None):
         super().__init__()
         self.position = (position[0], 0.75, position[1])
+        self.angle = angle if angle is not None else random() * 2 * pi
 
     @property
     def colliders(self):
@@ -25,7 +26,7 @@ class SmallTable(GameObject):
         front = textures.small_table_front
 
         w = 0.5
-        angle = random() * 2 * pi
+        angle = self.angle
 
         cos_w = cos(angle) * w
         sin_w = sin(angle) * w
