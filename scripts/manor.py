@@ -27,6 +27,7 @@ def init_manor():
 
     global seed
     set_random_seed(seed)
+    print("Seed:", seed)
 
     rooms = [[Room((j, i)) for i in range(grid_size)] for j in range(grid_size)]
 

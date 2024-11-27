@@ -17,6 +17,12 @@ game_state: GameState = GameState.MAIN_MENU
 def start_game():  # Never ask what this function is for, I'm too ashamed
     global game_state
     game_state = GameState.GAME
+    try:
+        with open("seed.txt") as f:
+            from scripts import manor
+            manor.seed = int(f.read().strip())
+    except (FileNotFoundError, ValueError):
+        pass
     init_manor()
 
 
