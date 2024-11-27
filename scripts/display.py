@@ -2,7 +2,7 @@ from typing import Final
 from os import environ as env
 
 from pygame import display, transform, Surface, Clock
-from pygame.constants import SRCALPHA, BLEND_RGB_SUB, SCALED
+from pygame.constants import SRCALPHA, BLEND_RGB_SUB, SCALED, FULLSCREEN
 
 window_size: tuple[int, int]
 overlay_size: tuple[int, int]
@@ -30,7 +30,7 @@ def init_display(fullscreen: bool = True):
     global window, game_screen, window_top_layer, window_size, overlay_size
 
     if fullscreen:
-        window = display.set_mode(vsync=True)
+        window = display.set_mode(vsync=True, flags=FULLSCREEN)
     else:
         window = display.set_mode((1080, 1080), vsync=True, flags=SCALED)
 
