@@ -108,7 +108,8 @@ def init_manor():
                 for room_b in current_group:
                     if ((room_a[0] == room_b[0] or room_a[1] == room_b[1])
                             and (abs(room_a[0] + room_a[1] - room_b[0] - room_b[1]) == 1)):
-                        rooms[room_a[0]][room_a[1]].connect_to(rooms[room_b[0]][room_b[1]])
+                        if randint(0, 3) > 0:
+                            rooms[room_a[0]][room_a[1]].connect_to(rooms[room_b[0]][room_b[1]])
 
             available_rooms = next_group
             next_group = []

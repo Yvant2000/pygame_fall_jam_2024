@@ -122,6 +122,8 @@ floors: tuple[Surface, ...] = tuple(load_image("rooms", "floors", f"floor{i}") f
 textures: tuple[Surface, ...] = tuple(load_image("rooms", "textures", f"texture{i}") for i in range(4))
 
 carpets: tuple[Surface, ...] = tuple(load_image("rooms", "carpets", f"carpet{i}") for i in range(4))
+trapdoors: tuple[Surface, ...] = tuple(load_image("rooms", "trapdoors", f"trapdoor{i}") for i in range(4))
+posters: tuple[Surface, ...] = tuple(load_image("rooms", "posters", f"poster{i}") for i in range(8))
 
 # Props
 doors: tuple[Surface, ...] = tuple(load_image("props", "doors", f"door{i}") for i in range(4))
@@ -136,4 +138,6 @@ small_table_front: Surface = load_image("props", "tables", "small_front")
 small_table_side: Surface = load_image("props", "tables", "small_side")
 lock: Surface = load_image("props", "lock")
 leather_chair: tuple[Surface, ...] = tuple(load_image("props", "leather_chair", f"leather{i}") for i in range(8))
-busts: tuple[Surface, ...] = tuple(load_image("props", "busts", f"bust{i}") for i in range(3))
+ornements: tuple[Surface, ...] = tuple(load_image("props", "ornements", f"ornement{i}") for i in range(7))
+pillars: tuple[Surface, ...] = tuple(load_image("props", "pillars", f"pillar{i}") for i in range(4))
+plants: tuple[Surface, ...] = tuple(load_image("props", "plants", f"plant{i}") for i in range(4))

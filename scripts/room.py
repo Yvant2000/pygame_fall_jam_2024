@@ -3,15 +3,18 @@ from math import pi, cos, sin
 from typing import Self
 
 from pygame import Surface
-from pygame import FRect
+from pygame.rect import FRect
+from pygame.transform import rotate
+
 from pysidocast import Scene
+
 from scripts import player, textures, display, input_manager
 
 
 class Room:
     def __init__(self, pos: tuple[int, int]):
         from scripts.game_object import GameObject
-        from scripts.objects import Chandelier, Table, TableLamp, Door, Bust
+        from scripts.objects import Chandelier, Table, TableLamp, Door, TableOrnement, Pillar, Plant
 
         self.pos: tuple[int, int] = pos
         self.scene = Scene()
@@ -37,14 +40,41 @@ class Room:
             if randint(0, 1) == 0:
                 self.light = TableLamp()
                 self.objects.append(self.light)
-            elif randint(0, 1) == 0:
-                self.objects.append(Bust((0, 0.85, 0)))
+            elif randint(0, 3) != 0:
+                self.objects.append(TableOrnement((0, 0.85, 0)))
 
         if self.light is None:
             self.light = Chandelier()
             self.objects.append(self.light)
 
-        # keep this method as small as possible, all the heavy load must be in static_loads and dynamic_loads
+        pillar: bool = False
+        plant: bool = False
+
+        if randint(0, 5) == 0:
+            self.objects.append(Pillar((-3, -3)))
+            pillar = True
+        elif randint(0, 4) == 0:
+            self.objects.append(Plant((-3, -3)))
+            plant = True
+
+        if not pillar and randint(0, 5) == 0:
+            self.objects.append(Pillar((3, -3)))
+            pillar = True
+        elif not plant and randint(0, 4) == 0:
+            self.objects.append(Plant((3, -3)))
+            plant = True
+
+        if not pillar and randint(0, 5) == 0:
+            self.objects.append(Pillar((-3, 3)))
+            pillar = True
+        elif not plant and randint(0, 4) == 0:
+            self.objects.append(Plant((-3, 3)))
+            plant = True
+
+        if not pillar and randint(0, 5) == 0:
+            self.objects.append(Pillar((3, 3)))
+        elif not plant and randint(0, 4) == 0:
+            self.objects.append(Plant((3, 3)))
 
     def connect_to(self, other: Self):
         """Adds a door between two rooms"""
@@ -114,12 +144,23 @@ class Room:
         wall_sprite: Surface = textures.merge_wall(textures.walls_bot[wall_index], textures.walls_top[wall_index])
         wall_texture: Surface = random_choice(textures.textures)
 
-        wall_x: Surface = textures.repeat_layered(
+        wall_x1: Surface = textures.repeat_layered(
             wall_sprite, self.size[0] // 2, 1, wall_texture, self.size[0] // 2 - 1, 3
         )
-        wall_z: Surface = textures.repeat_layered(
+        wall_x2 = wall_x1.copy()
+        wall_z1: Surface = textures.repeat_layered(
             wall_sprite, self.size[1] // 2, 1, wall_texture, self.size[1] // 2 - 1, 3
         )
+        wall_z2 = wall_z1.copy()
+
+        if randint(0, 2) == 0:
+            wall = random_choice((wall_x1, wall_x2, wall_z1, wall_z2))
+            poster = random_choice(textures.posters)
+            poster_rot = rotate(poster, randint(-30, 30))
+            wall.blit(
+                poster_rot, (randint(0, wall.get_width() - poster_rot.get_width()),
+                             randint(0, wall.get_height() - poster_rot.get_height() - 20))
+            )
 
         x = self.size[0]
         y: float = self.height
@@ -127,10 +168,10 @@ class Room:
         half_x: float = x / 2
         half_z: float = z / 2
 
-        self.scene.add_wall(wall_x, (-half_x, y, half_z), (half_x, 0, half_z))
-        self.scene.add_wall(wall_x, (half_x, y, -half_z), (-half_x, 0, -half_z))
-        self.scene.add_wall(wall_z, (-half_x, y, -half_z), (-half_x, 0, half_z))
-        self.scene.add_wall(wall_z, (half_x, y, half_z), (half_x, 0, -half_z))
+        self.scene.add_wall(wall_x1, (-half_x, y, half_z), (half_x, 0, half_z))
+        self.scene.add_wall(wall_x2, (half_x, y, -half_z), (-half_x, 0, -half_z))
+        self.scene.add_wall(wall_z1, (-half_x, y, -half_z), (-half_x, 0, half_z))
+        self.scene.add_wall(wall_z2, (half_x, y, half_z), (half_x, 0, -half_z))
 
         floor_sprite: Surface = random_choice(textures.floors)
         floor_texture = random_choice(textures.textures)
@@ -138,6 +179,14 @@ class Room:
             floor_sprite, self.size[0] // 2, self.size[1] // 2,
             floor_texture, self.size[0] // 2 - 1, self.size[1] // 2 - 1
         )
+
+        if randint(0, 3) == 0:
+            trapdoor = random_choice(textures.trapdoors)
+            trapdoor_rot = rotate(trapdoor, randint(0, 360))
+            floor.blit(
+                trapdoor_rot, (randint(0, floor.get_width() - trapdoor_rot.get_width()),
+                               randint(0, floor.get_height() - trapdoor_rot.get_height()))
+            )
 
         if randint(0, 3) > 0:
             carpet_sprite: Surface = random_choice(textures.carpets)

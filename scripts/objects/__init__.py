@@ -6,4 +6,6 @@ from scripts.objects.table_lamp import TableLamp
 from scripts.objects.key import Key
 from scripts.objects.small_table import SmallTable
 from scripts.objects.leather_chair import LeatherChair
-from scripts.objects.bust import Bust
+from scripts.objects.table_ornement import TableOrnement
+from scripts.objects.pillar import Pillar
+from scripts.objects.plant import Plant

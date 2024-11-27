@@ -1,5 +1,5 @@
 from random import choice as random_choice
-from math import cos, sin, pi, radians, atan2
+from math import cos, sin, radians
 
 from scripts.game_object import GameObject
 from scripts.room import Room
@@ -14,11 +14,11 @@ def rsin(angle: float) -> float:
     return sin(radians(angle))
 
 
-class Bust(GameObject):
+class TableOrnement(GameObject):
     def __init__(self, position: tuple[float, float, float]):
         super().__init__()
         self.position = position
-        self.image = random_choice(textures.busts)
+        self.image = random_choice(textures.ornements)
 
     def static_load(self, room: Room):
         pass
@@ -26,8 +26,8 @@ class Bust(GameObject):
     def dynamic_load(self, room: Room):
         scene = room.scene
 
-        w = 0.3
-        h = 0.5
+        w = 0.4
+        h = 0.7
 
         pa = player.angle_y + 90
 
