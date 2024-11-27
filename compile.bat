@@ -1,1 +1,1 @@
-python -m nuitka --standalone --onefile --python-flag=-O --main=main.py --prefer-source-code --include-data-dir=assets=assets --include-data-files=pygame_dlls/*.dll=./ --warn-implicit-exceptions --warn-unusual-code --assume-yes-for-downloads --output-filename=64ROOMS --deployment --show-memory --windows-console-mode=hide --windows-icon-from-ico=icon.ico
+pyinstaller --onefile --name 64ROOMS --add-data ./assets:./assets --hide-console hide-late --icon icon.ico main.py

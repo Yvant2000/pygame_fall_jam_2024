@@ -1,5 +1,6 @@
 from typing import Final
 from os.path import join as join_path
+import sys
 
 from pygame import Surface, image as pg_image
 from pygame.transform import scale, flip
@@ -10,6 +11,8 @@ images_folder: str = join_path("assets", "images")
 
 def load_image(path: str, *var_path: str) -> Surface:
     full_path = join_path(images_folder, f"{join_path(path, *var_path)}.png")
+    if hasattr(sys, "_MEIPASS"):
+        full_path = join_path(sys._MEIPASS, full_path)
     image = pg_image.load(full_path).convert_alpha()
     return image
 

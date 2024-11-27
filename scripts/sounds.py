@@ -1,4 +1,5 @@
 from os.path import join as join_path
+import sys
 
 from pygame.mixer import Sound, init as mixer_init
 
@@ -9,6 +10,8 @@ sound_folder: str = join_path("assets", "sounds")
 
 def load_sound(path: str, *var_path: str) -> Sound:
     full_path = join_path(sound_folder, f"{join_path(path, *var_path)}.mp3")
+    if hasattr(sys, "_MEIPASS"):
+        full_path = join_path(sys._MEIPASS, full_path)
     sound = Sound(full_path)
     return sound
 

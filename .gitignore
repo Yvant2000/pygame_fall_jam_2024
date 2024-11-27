@@ -5,3 +5,6 @@ main.dist/
 main.onefile-build/
 pygame_dlls/
 main.exe
+dist/
+build/
+*.spec

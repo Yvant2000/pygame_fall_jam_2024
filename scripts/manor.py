@@ -1,6 +1,7 @@
 from typing import Final
 from random import randrange, seed as set_random_seed, choice as random_choice, randint
 from os.path import join as join_path
+import sys
 
 from pygame import Surface
 from pygame.constants import SRCALPHA
@@ -146,7 +147,11 @@ def init_manor():
         for room in list_rooms:  # type: Room
             room.static_loads()
 
-    music.load(join_path("assets", "sounds", "an_empty_manor.mp3"))
+    path = join_path("assets", "sounds", "an_empty_manor.mp3")
+    if hasattr(sys, "_MEIPASS"):
+        path = join_path(sys._MEIPASS, path)
+
+    music.load(path)
     music.set_volume(0.5)
     music.play(-1)
 
