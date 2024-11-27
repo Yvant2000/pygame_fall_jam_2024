@@ -1,6 +1,5 @@
 from random import choice as random_choice, randint, random
 from math import pi, cos, sin
-from typing import Self
 
 from pygame import Surface
 from pygame.rect import FRect
@@ -43,7 +42,7 @@ class Room:
             elif randint(0, 3) != 0:
                 self.objects.append(TableOrnement((0, 0.85, 0)))
 
-    def connect_to(self, other: Self):
+    def connect_to(self, other):
         """Adds a door between two rooms"""
         assert (self.pos[0] == other.pos[0] or self.pos[1] == other.pos[1]) and (
                 abs(self.pos[0] + self.pos[1] - other.pos[0] - other.pos[1]) == 1), "rooms must be adjacent"
